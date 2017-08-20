@@ -1,14 +1,18 @@
 {
   "name": "http-fetch-client",
   "version": "0.0.1",
-  "description": "",
+  "description": "a http client",
   "main": "index.js",
   "scripts": {
     "build": "webpack --config ./webpack.config.js",
     "dev": "npm run build",
     "pro": "export NODE_ENV=production || set NODE_ENV=production && npm run build"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ignous/http-fetch-client.git"
+  },
+  "author": "ignous",
   "license": "MIT",
   "devDependencies": {
     "babel": "^6.23.0",
