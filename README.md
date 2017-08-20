@@ -1,9 +1,15 @@
-# request.js
+# http-fetch-client.js
+## Installation
+```
+npm install --save http-fetch-client
+```
 
+## Usage
 ```js
-import request from 'request';
+import Fetch from 'http-fetch-client';
 
-request(
+let fetch = new Fetch();
+fetch.request(
   '/test',
   {
     method: 'GET',
@@ -12,11 +18,12 @@ request(
 )
 ```
 
-## use callback
+### with callback
 ```js
-import request from 'request';
+import Fetch from 'http-fetch-client';
 
-request(...).use((response) => {
+let fetch = new Fetch();
+fetch.request(...).use((response) => {
   if (response.ok) {
     //  response.status in 200 - 300
   } else {
@@ -25,11 +32,12 @@ request(...).use((response) => {
 })
 ```
 
-## global callback
+### global callback
 ```js
-import request from 'request';
+import Fetch from 'http-fetch-client';
 
-request.use((response) => {
+let fetch = new Fetch();
+fetch.use((response) => {
   if (response.ok) {
     //  response.status in 200 - 300
   } else {
@@ -38,11 +46,12 @@ request.use((response) => {
 })
 ```
 
-## async & promise support
+### async & promise support
 ```js
-import request from 'request';
+import Fetch from 'http-fetch-client';
 
-request.use(async (response) => {
+let fetch = new Fetch();
+fetch.request(...).use(async (response) => {
   return await setTimeout(() => { console.log('first after 1000ms') }, 1000);
 }).use((response) => {
   console.log('second')
@@ -52,16 +61,17 @@ request.use(async (response) => {
 // second;
 ```
 
-## cyclic callback
+### cyclic callback
 ```js
-import request from 'request';
+import Fetch from 'http-fetch-client';
 
-request.use(function * (response) {
+let fetch = new Fetch();
+fetch.use(function * (response) {
   console.log('global start');
   yield true;
   console.log('global end');
 });
-request(...).use(function * (response) {
+fetch.request(...).use(function * (response) {
   console.log('request start');
   yield true;
   console.log('request end');
@@ -73,74 +83,36 @@ request(...).use(function * (response) {
 // global end
 ```
 
-## other callback support ( beforeSend/error )
+### other callback support ( beforeSend/error )
 ```js
-import request from 'request';
+import Fetch from 'http-fetch-client';
 
-request.use({
-  beforeSend: (request) => {},
-  error: (response, request) => {},
-  success: (response, request) => {}
+let fetch = new Fetch();
+fetch.use({
+  beforeSend: (request) => {
+    request.setHeaders({
+      'X-Custom-Header': 'some'
+    })
+  },
+  error: (response, request) => {
+    // ...
+  },
+  success: (response, request) => {
+    // ...
+  }
 }));
 // error: callback when network error (status === 0)
 // beforeSend: before request send. not use like request(...).use
 // success: status 1 - ...
 ```
 
-## RestFull api
-### get
+### Request method aliases
 ```js
-import { get } from 'request';
+import Fetch from 'http-fetch-client';
 
-get(
-  '/user/{id}',
-  {
-    data: {
-      id: 1
-    }
-  }
-)
-```
-
-### post
-```js
-import { post } from 'request';
-
-get(
-  '/user/create',
-  {
-    data: {
-      name: 'a'
-    }
-  }
-)
-```
-
-### put
-```js
-import { put } from 'request';
-
-put(
-  '/user/{id}',
-  {
-    data: {
-      id: 1,
-      name: 'b'
-    }
-  }
-)
-```
-
-### del
-```js
-import { del } from 'request';
-
-del(
-  '/user/{id}',
-  {
-    data: {
-      id: 1
-    }
-  }
-)
+let fetch = new Fetch();
+fetch.get(url[, options])
+fetch.post(url[, options])
+fetch.put(url[, options])
+fetch.del(url[, options])
 ```

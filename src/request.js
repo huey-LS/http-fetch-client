@@ -80,12 +80,25 @@ class HandleCreator {
   }
 }
 
-export const globalHandle = new HandleCreator();
+export default class Fetch {
+  _globalHandle = new HandleCreator()
+  request = request
+  get = get
+  post = post
+  put = put
+  del = del
+}
 
-export default function request (...args) {
+export function request (...args) {
   var fetchRequest = new Request(...args);
 
-  var currentHandle = globalHandle.create();
+  var currentHandle;
+
+  if (this instanceof Fetch && this._globalHandle instanceof HandleCreator) {
+    currentHandle = this._globalHandle.create();
+  } else {
+    currentHandle = (new HandleCreator()).create();
+  }
 
   currentHandle.start({
     value: [fetchRequest],
