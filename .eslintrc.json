@@ -1,0 +1,39 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "ecmaFeatures": {
+      "jsx": true,
+      "experimentalObjectRestSpread": true
+    }
+  },
+  "globals": {
+    "Redux": false,
+    "ReduxThunk": false
+  },
+  "extends": [
+    "standard"
+  ],
+  "plugins": [
+    "react"
+  ],
+  "rules": {
+    "one-var": "off",
+    "eol-last": "warn",
+    "semi": "off",
+    "prefer-promise-reject-errors": "off",
+    "space-before-function-paren": "warn",
+    "no-new": "off",
+    "no-extra-semi": "warn",
+    "no-unused-vars": ["error", { "varsIgnorePattern": "^React" }],
+    "no-multiple-empty-lines": ["warn", { "max": 1, "maxEOF": 0 }],
+    "quotes": ["warn", "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
+    "standard/no-callback-literal": "off",
+    "react/jsx-uses-vars": "error"
+  }
+}

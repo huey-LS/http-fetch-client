@@ -1,0 +1,12 @@
+.DS_Store
+.eslintrc
+.idea
+
+node_modules
+.vscode
+
+
+*.log
+dist
+
+config/conf_set.js
