@@ -1,6 +1,4 @@
-import Ajax, { AjaxRequest } from './ajax';
-
-export const Request = AjaxRequest;
+import Ajax from './ajax';
 
 export default function fetch (...args) {
   var _resolve, _reject;

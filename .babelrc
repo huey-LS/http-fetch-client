@@ -1,0 +1,19 @@
+{
+  "env": {
+    "commonjs": {
+      "presets": [
+        ["env", { "loose": true }],
+        "stage-2"
+      ]
+    },
+    "es": {
+      "presets": [
+        ["env", { "loose": true, "modules": false }],
+        "stage-2"
+      ]
+    }
+  },
+  "plugins": [
+    "transform-runtime"
+  ]
+}

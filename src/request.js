@@ -1,159 +1,101 @@
-import fetch, { Request } from './fetch';
-import isGeneratorFunction from './isGeneratorFunction';
+export default class Request {
+  constructor (url, options) {
+    this._url = url;
+    this._options = Object.assign({
+      timeout: 20000,
+      sendType: 'form',
+      acceptType: 'json',
+      async: true
+    }, options);
 
-export { fetch, Request };
+    this.setHeaders();
+  }
 
-class Handles {
-  handleQueue = []
-  playingHandles = {}
-  _isEnd = {}
+  getInitHeaders () {
+    return {
+      'Content-Type': (this._options.sendType === 'json'
+        ? 'application/json; charset=UTF-8'
+        : 'application/x-www-form-urlencoded; charset=UTF-8'),
+      'Accept': (this._options.acceptType === 'json'
+        ? 'application/json,text/javascript'
+        : 'application/json,text/javascript')
+    };
+  }
 
-  constructor (handleQueue) {
-    if (Array.isArray(handleQueue)) {
-      handleQueue.forEach((handle) => { this.use(handle) })
+  getHeaders () {
+    return this._options.headers || {};
+  }
+
+  setHeaders (headers) {
+    this._options.headers = Object.assign({}, this.getInitHeaders(), this._options.headers, headers);
+  }
+
+  getData () {
+    return this._options.data || {};
+  }
+
+  getDataJson () {
+    return JSON.stringify(this.getData());
+  }
+
+  getDataForm () {
+    var data = this.getData();
+    return Object.keys(data)
+      .map((key) => `${key}=${encodeURIComponent(data[key])}`)
+      .join('&');
+  }
+
+  getDataString () {
+    switch (this._options.sendType) {
+      case 'json':
+        return this.getDataJson();
+
+      default:
+        return this.getDataForm();
     }
   }
 
-  use (handle) {
-    if (typeof handle === 'function') {
-      this.handleQueue.push({ success: handle });
-    } else {
-      this.handleQueue.push(handle);
-    }
-    return this;
+  setData (newData) {
+    this._options.data = Object.assign({}, this._options.data, newData);
   }
 
-  start ({ value = [], type = 'success' } = {}) {
-    var handleFns = this.handleQueue
-      .filter((handle) => handle[type])
-      .map((handle) => handle[type]);
-
-    this.playingHandles[type] = handleFns.map((handle) => {
-      if (isGeneratorFunction(handle)) {
-        return handle(...value);
-      } else {
-        var currentFn = function * () { return handle(...value); }
-        return currentFn();
-      }
-    });
-
-    this._isEnd[type] = false;
-
-    return this;
+  getUrl () {
+    return formatUrl(this._url, this.getData());
   }
 
-  play = async ({ reverse, type = 'success' } = {}) => {
-    var playingHandles = this.playingHandles[type];
-    if (!playingHandles || this._isEnd[type]) return false;
-    var i = 0;
-    var len = playingHandles.length;
-    for (; i < len; i++) {
-      let index = reverse ? (len - i - 1) : i;
-      var handleResult;
-      try {
-        handleResult = await playingHandles[index].next();
-      } catch (e) {
-        handleResult = { value: false };
-      }
-      if (handleResult.value === false) {
-        this._isEnd[type] = true;
-        return false;
-      } else if (handleResult.done) {
-        playingHandles.splice(i, 1);
-        i--;
-        len--;
-      }
-    }
-    return true;
+  getUrlWithQuery () {
+    var baseUrl = this.getUrl();
+    var query = this.getQuery();
+    query = query ? '?' + query : '';
+    return `${baseUrl}${query}`;
+  }
+
+  getQuery () {
+    var data = this.getData();
+    return Object.keys(data).map((key) => {
+      return `${key}=${data[key]}`;
+    }).join('&');
+  }
+
+  getOptions () {
+    return this._options;
+  }
+
+  setOptions (newOptions) {
+    this._options = Object.assign({}, this._options, newOptions);
+    return this._options;
+  }
+
+  getMethod () {
+    var { method } = this.getOptions();
+    method = method.toUpperCase();
+    return method;
   }
 }
 
-class HandleCreator {
-  handleQueue = []
-
-  use (handle) {
-    this.handleQueue.push(handle);
-  }
-
-  create () {
-    return new Handles(this.handleQueue);
-  }
-}
-
-export default class Fetch {
-  _globalHandle = new HandleCreator()
-  request = request
-  get = get
-  post = post
-  put = put
-  del = del
-}
-
-export function request (...args) {
-  var fetchRequest = new Request(...args);
-
-  var currentHandle;
-
-  if (this instanceof Fetch && this._globalHandle instanceof HandleCreator) {
-    currentHandle = this._globalHandle.create();
-  } else {
-    currentHandle = (new HandleCreator()).create();
-  }
-
-  currentHandle.start({
-    value: [fetchRequest],
-    type: 'beforeSend'
+function formatUrl (url, data) {
+  if (typeof url !== 'string' || !data) return url;
+  return url.replace(/\{(\w+)\}/g, function (searchValue, key) {
+    if (typeof data[key] !== 'undefined') return data[key];
   });
-
-  currentHandle.play({
-    type: 'beforeSend'
-  });
-
-  fetch(fetchRequest)
-    .then(async (response) => {
-      currentHandle.start({
-        value: [response, fetchRequest],
-        type: 'success'
-      });
-      await currentHandle.play({ type: 'success' });
-      await currentHandle.play({ type: 'success', reverse: true });
-    }, async (response) => {
-      currentHandle.start({
-        value: [response, fetchRequest],
-        type: 'error'
-      });
-      await currentHandle.play({ type: 'error' });
-      await currentHandle.play({ type: 'error', reverse: true });
-    })
-
-  return currentHandle;
-}
-
-export function get (url, options) {
-  return request(
-    url,
-    Object.assign({}, options, { method: 'GET' })
-  )
-}
-
-export function post (url, options) {
-  return request(
-    url,
-    Object.assign({}, options, { method: 'POST' })
-  )
-}
-
-export function put (url, options) {
-  return request(
-    url,
-    Object.assign({}, options, { method: 'PUT' })
-  )
-}
-
-// delete is a keyword
-export function del (url, options) {
-  return request(
-    url,
-    Object.assign({}, options, { method: 'DELETE' })
-  )
 }

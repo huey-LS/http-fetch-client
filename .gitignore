@@ -8,5 +8,7 @@ node_modules
 
 *.log
 dist
+lib
+es
 
 config/conf_set.js

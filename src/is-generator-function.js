@@ -3,12 +3,12 @@ var fnToStr = Function.prototype.toString;
 var isFnRegex = /^\s*(?:function)?\*/;
 var hasToStringTag = typeof Symbol === 'function' && typeof Symbol.toStringTag === 'symbol';
 var getProto = Object.getPrototypeOf;
-var getGeneratorFunc = function () { // eslint-disable-line consistent-return
+var getGeneratorFunc = function () {
   if (!hasToStringTag) {
     return false;
   }
   try {
-    return function* () {};
+    return function * () {};
   } catch (e) {}
 };
 var generatorFunc = getGeneratorFunc();

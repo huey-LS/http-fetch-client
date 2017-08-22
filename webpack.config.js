@@ -6,11 +6,14 @@ const distPath = './dist';
 
 module.exports = {
   entry: {
-    request: path.resolve(__dirname, 'index.js')
+    'fetch-client': path.resolve(__dirname, 'index.js')
   },
   output: {
     path: path.resolve(__dirname, distPath),
-    filename: '[name].js'
+    filename: '[name].js',
+    // library: 'FetchClient',
+    // libraryTarget: 'umd',
+    // umdNamedDefine: true
   },
   resolve: {
     extensions: ['.js']
@@ -27,13 +30,7 @@ module.exports = {
         ],
         exclude: [
           path.resolve(__dirname, distPath)
-        ],
-        query: {
-          presets: ['env', 'stage-2'],
-          plugins: [
-            'transform-runtime'
-          ]
-        }
+        ]
       }
     ]
   },
