@@ -1,4 +1,13 @@
 export default class Request {
+  static sendTypeMap = {
+    'json': 'application/json; charset=UTF-8',
+    'form': 'application/x-www-form-urlencoded; charset=UTF-8'
+  }
+
+  static acceptTypeMap = {
+    'json': 'application/json,text/javascript'
+  }
+
   constructor (url, options) {
     this._url = url;
     this._options = Object.assign({
@@ -12,14 +21,17 @@ export default class Request {
   }
 
   getInitHeaders () {
-    return {
-      'Content-Type': (this._options.sendType === 'json'
-        ? 'application/json; charset=UTF-8'
-        : 'application/x-www-form-urlencoded; charset=UTF-8'),
-      'Accept': (this._options.acceptType === 'json'
-        ? 'application/json,text/javascript'
-        : 'application/json,text/javascript')
-    };
+    let initHeaders = {};
+    let contentType = Request.sendTypeMap[this._options.sendType];
+    if (contentType) {
+      initHeaders['Content-Type'] = contentType;
+    }
+
+    let accept = Request.acceptTypeMap[this._options.acceptType];
+    if (accept) {
+      initHeaders['Accept'] = accept;
+    }
+    return initHeaders;
   }
 
   getHeaders () {
@@ -45,10 +57,29 @@ export default class Request {
       .join('&');
   }
 
+  getDataFormData () {
+    var data = this.getData();
+    var formData = new FormData();
+
+    Object.keys(data)
+      .forEach((key) => {
+        let _value = data[key];
+        if (typeof _value === 'string') {
+          _value = encodeURIComponent(_value);
+        }
+        formData.append(key, _value);
+      })
+
+    return formData;
+  }
+
   getDataString () {
     switch (this._options.sendType) {
       case 'json':
         return this.getDataJson();
+
+      case 'formData':
+        return this.getDataFormData();
 
       default:
         return this.getDataForm();
