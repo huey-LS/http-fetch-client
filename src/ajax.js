@@ -21,7 +21,16 @@ export default class Ajax {
       var options = this._request.getOptions();
       var onerror = options.onerror;
       xhr.abort();
+      xhr._hasAbort = true;
       this.applyCallback(xhr, onerror, options);
+    }
+  }
+
+  timeout () {
+    var xhr = this.xhr;
+    if (xhr.readyState !== 4 && !this.end) {
+      xhr._hasTimeout = true;
+      this.abort();
     }
   }
 
@@ -56,7 +65,8 @@ export default class Ajax {
       setTimeout(() => {
         this.abort();
         // delete this.__timer;
-      }, timeout)
+      }, timeout);
+      xhr.timeout = timeout;
     }
 
     Object.keys(headers).forEach((key) => {

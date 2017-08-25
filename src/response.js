@@ -8,6 +8,10 @@ export default class Response {
     this.ok = xhr.status >= 200 && xhr.status < 300;
   }
 
+  text () {
+    return this._xhr.responseText || this._xhr.response;
+  }
+
   json () {
     var json;
 
@@ -36,5 +40,13 @@ export default class Response {
     }, {})
 
     return headers;
+  }
+
+  isTimeout () {
+    return this._xhr._hasTimeout;
+  }
+
+  isAborted () {
+    return this._xhr._hasAborted;
   }
 }
