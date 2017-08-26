@@ -1,6 +1,6 @@
 {
   "name": "http-fetch-client",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "a http client",
   "files": [
     "lib",
@@ -39,7 +39,5 @@
     "cross-env": "^5.0.5",
     "webpack": "^3.5.5"
   },
-  "dependencies": {
-
-  }
+  "dependencies": {}
 }
