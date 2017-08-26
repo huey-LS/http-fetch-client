@@ -21,7 +21,7 @@ export default class Ajax {
       var options = this._request.getOptions();
       var onerror = options.onerror;
       xhr.abort();
-      xhr._hasAbort = true;
+      xhr._hasAborted = true;
       this.applyCallback(xhr, onerror, options);
     }
   }
