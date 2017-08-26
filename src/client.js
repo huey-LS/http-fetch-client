@@ -81,11 +81,11 @@ class HandleCreator {
 
 export default class Client {
   _globalHandle = new HandleCreator()
-  request = request
-  get = get
-  post = post
-  put = put
-  del = del
+  request = request.bind(this)
+  get = createBindMethod('GET', this.request)
+  post = createBindMethod('POST', this.request)
+  put = createBindMethod('PUT', this.request)
+  del = createBindMethod('DELETE', this.request)
 
   constructor () {
     this.use = this._globalHandle.use.bind(this._globalHandle);
@@ -132,31 +132,16 @@ export function request (...args) {
   return currentHandle;
 }
 
-export function get (url, options) {
-  return request(
-    url,
-    Object.assign({}, options, { method: 'GET' })
-  )
-}
+export const get = createBindMethod('GET');
+export const post = createBindMethod('POST');
+export const put = createBindMethod('PUT');
+export const del = createBindMethod('DELETE');
 
-export function post (url, options) {
-  return request(
-    url,
-    Object.assign({}, options, { method: 'POST' })
-  )
-}
-
-export function put (url, options) {
-  return request(
-    url,
-    Object.assign({}, options, { method: 'PUT' })
-  )
-}
-
-// delete is a keyword
-export function del (url, options) {
-  return request(
-    url,
-    Object.assign({}, options, { method: 'DELETE' })
+function createBindMethod (method, requestFn = request) {
+  return (url, options) => (
+    requestFn(
+      url,
+      Object.assign({}, options, { method: 'GET' })
+    )
   )
 }

@@ -4,6 +4,9 @@
 npm install --save http-fetch-client
 ```
 
+## examples
+[https://github.com/ignous/http-fetch-client-examples](https://github.com/ignous/http-fetch-client-examples)
+
 ## Usage
 ```js
 import Fetch from 'http-fetch-client';
