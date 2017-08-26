@@ -9,9 +9,9 @@ npm install --save http-fetch-client
 
 ## Usage
 ```js
-import Fetch from 'http-fetch-client';
+import FetchClient from 'http-fetch-client';
 
-let fetch = new Fetch();
+let fetch = new FetchClient();
 fetch.request(
   '/test',
   {
@@ -23,9 +23,9 @@ fetch.request(
 
 ### with callback
 ```js
-import Fetch from 'http-fetch-client';
+import FetchClient from 'http-fetch-client';
 
-let fetch = new Fetch();
+let fetch = new FetchClient();
 fetch.request(...).use((response) => {
   if (response.ok) {
     //  response.status in 200 - 300
@@ -37,9 +37,9 @@ fetch.request(...).use((response) => {
 
 ### global callback
 ```js
-import Fetch from 'http-fetch-client';
+import FetchClient from 'http-fetch-client';
 
-let fetch = new Fetch();
+let fetch = new FetchClient();
 fetch.use((response) => {
   if (response.ok) {
     //  response.status in 200 - 300
@@ -51,9 +51,9 @@ fetch.use((response) => {
 
 ### async & promise support
 ```js
-import Fetch from 'http-fetch-client';
+import FetchClient from 'http-fetch-client';
 
-let fetch = new Fetch();
+let fetch = new FetchClient();
 fetch.request(...).use(async (response) => {
   return await setTimeout(() => { console.log('first after 1000ms') }, 1000);
 }).use((response) => {
@@ -66,9 +66,9 @@ fetch.request(...).use(async (response) => {
 
 ### cyclic callback
 ```js
-import Fetch from 'http-fetch-client';
+import FetchClient from 'http-fetch-client';
 
-let fetch = new Fetch();
+let fetch = new FetchClient();
 fetch.use(function * (response) {
   console.log('global start');
   yield true;
@@ -88,9 +88,9 @@ fetch.request(...).use(function * (response) {
 
 ### other callback support ( beforeSend/error )
 ```js
-import Fetch from 'http-fetch-client';
+import FetchClient from 'http-fetch-client';
 
-let fetch = new Fetch();
+let fetch = new FetchClient();
 fetch.use({
   beforeSend: (request) => {
     request.setHeaders({
@@ -111,9 +111,9 @@ fetch.use({
 
 ### Request method aliases
 ```js
-import Fetch from 'http-fetch-client';
+import FetchClient from 'http-fetch-client';
 
-let fetch = new Fetch();
+let fetch = new FetchClient();
 fetch.get(url[, options])
 fetch.post(url[, options])
 fetch.put(url[, options])
