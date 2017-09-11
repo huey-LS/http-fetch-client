@@ -1,7 +1,13 @@
 {
   "name": "http-fetch-client",
   "version": "0.1.1",
-  "description": "a http client",
+  "description": "a http client for browser",
+  "keywords": [
+    "fetch",
+    "http",
+    "request",
+    "browser"
+  ],
   "files": [
     "lib",
     "es",

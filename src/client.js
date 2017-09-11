@@ -141,7 +141,7 @@ function createBindMethod (method, requestFn = request) {
   return (url, options) => (
     requestFn(
       url,
-      Object.assign({}, options, { method: 'GET' })
+      Object.assign({}, options, { method })
     )
   )
 }

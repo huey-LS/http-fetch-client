@@ -1,4 +1,6 @@
 # http-fetch-client.js
+a fetch client for browser
+
 ## Installation
 ```
 npm install --save http-fetch-client
