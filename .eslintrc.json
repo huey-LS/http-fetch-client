@@ -12,10 +12,6 @@
       "experimentalObjectRestSpread": true
     }
   },
-  "globals": {
-    "Redux": false,
-    "ReduxThunk": false
-  },
   "extends": [
     "standard"
   ],
