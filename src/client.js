@@ -31,7 +31,7 @@ class Handles {
       if (isGeneratorFunction(handle)) {
         return handle(...value);
       } else {
-        var currentFn = function () { return handle(...value); }
+        var currentFn = function * () { return handle(...value); }
         return currentFn();
       }
     });
