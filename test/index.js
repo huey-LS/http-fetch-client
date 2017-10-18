@@ -14,52 +14,30 @@ describe('xhr', function () {
   });
 
   describe('get', function () {
-    it('send get http request', function (done) {
-      let fetch = new FetchClient();
-      let data = {'test': 'abc'};
+    let fetch = new FetchClient();
+    let data = {'test': 'abc'};
+    it('method is GET', () => {
+      fetch
+        .get('http://fake.com')
+      assert.equal(xhr.method, 'GET')
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    });
+
+    it('request body to query', () => {
       fetch
         .get('http://fake.com', {
-          data: data
+          body: data
         })
-        .use((response, request) => {
-          try {
-            assert.equal(request.getMethod(), 'GET');
-            assert.equal(response._xhr.method, 'GET');
-            assert.equal(response._xhr.url, 'http://fake.com?test=abc');
-            assert.equal(response.text(), 'test');
-            done();
-          } catch (e) {
-            done(e)
-          }
-        });
-      xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
+      assert.equal(xhr.requestBody, 'test=abc');
+      assert.equal(xhr.url, 'http://fake.com?test=abc');
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     })
 
-    it('get json response', function (done) {
-      let fetch = new FetchClient();
+    it('response body to text', (done) => {
       fetch
         .get('http://fake.com')
         .use((response) => {
           try {
-            assert.deepEqual(response.json(), {'test': 'abc'});
-            done();
-          } catch (e) {
-            done(e)
-          }
-        });
-      xhr.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({'test': 'abc'}));
-    })
-  })
-
-  describe('post', function () {
-    it('send post http request', function (done) {
-      let fetch = new FetchClient();
-      fetch
-        .post('http://fake.com')
-        .use((response, request) => {
-          try {
-            assert.equal(request.getMethod(), 'POST');
-            assert.equal(response._xhr.method, 'POST');
             assert.equal(response.text(), 'test');
             done();
           } catch (e) {
@@ -69,30 +47,81 @@ describe('xhr', function () {
       xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
     })
 
-    it('send post http request with json data', function (done) {
-      let fetch = new FetchClient();
-      let data = {'test': 'abc'};
+    it('response body to json', (done) => {
       fetch
-        .post('http://fake.com', {
-          sendType: 'json',
-          data: data
-        })
+        .get('http://fake.com')
         .use((response) => {
           try {
-            assert.equal(response._xhr.requestHeaders['Content-Type'], 'application/json;charset=utf-8');
-            assert.deepEqual(data, JSON.parse(response._xhr.requestBody))
-            assert.deepEqual(response.json(), {'test': 'abc'});
+            assert.deepEqual(response.json(), data);
             done();
           } catch (e) {
             done(e)
           }
-        });
-      xhr.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({'test': 'abc'}));
+        })
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, JSON.stringify(data));
+    })
+  })
+
+  describe('post', () => {
+    let fetch = new FetchClient();
+    let data = {'test': 'abc'};
+    it('method is POST', () => {
+      fetch
+        .post('http://fake.com')
+      assert.equal(xhr.method, 'POST')
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    });
+
+    it('request form body', () => {
+      fetch
+        .post('http://fake.com', {
+          body: data
+        })
+      assert.equal(xhr.requestBody.replace(/[\n\r]/g, ''), 'test=abc')
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    })
+
+    it('request json body', () => {
+      fetch
+        .post('http://fake.com', {
+          body: data,
+          sendType: 'json'
+        })
+      assert.equal(xhr.requestBody, JSON.stringify(data));
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    })
+
+    it('response body to text', (done) => {
+      fetch
+        .post('http://fake.com')
+        .use((response) => {
+          try {
+            assert.equal(response.text(), 'test');
+            done();
+          } catch (e) {
+            done(e)
+          }
+        })
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
+    })
+
+    it('response body to json', (done) => {
+      fetch
+        .post('http://fake.com')
+        .use((response) => {
+          try {
+            assert.deepEqual(response.json(), data);
+            done();
+          } catch (e) {
+            done(e)
+          }
+        })
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, JSON.stringify(data));
     })
   })
 
   describe('global', function () {
-    it('test global', function (done) {
+    it('beforeSend set headers', () => {
       let fetch = new FetchClient();
       fetch
         .use({
@@ -100,14 +129,40 @@ describe('xhr', function () {
             request.setHeaders({
               'X-Custom-Header': 'some'
             })
-          },
-          success: function * (response) {
-            response._global_set = 'global';
+          }
+        });
+
+      fetch
+        .get('http://fake.com')
+      assert.equal(xhr.requestHeaders['X-Custom-Header'], 'some');
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
+    })
+
+    it('on success get body', (done) => {
+      let fetch = new FetchClient();
+      fetch
+        .use({
+          success: (response) => {
             try {
               assert.equal(response.text(), 'test');
+              done();
             } catch (e) {
               done(e)
             }
+          }
+        })
+
+      fetch.get('http://fake.com')
+
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
+    });
+
+    it('pass data between global and request', (done) => {
+      let fetch = new FetchClient();
+      fetch
+        .use({
+          success: function * (response) {
+            response._global_set = 'global';
             yield;
             try {
               assert.equal(response._use_set, 'use');
@@ -116,21 +171,19 @@ describe('xhr', function () {
               done(e)
             }
           }
-        });
+        })
 
       fetch
         .get('http://fake.com')
-        .use((response, request) => {
+        .use((response) => {
           response._use_set = 'use';
           try {
-            assert.equal(request.getHeaders()['X-Custom-Header'], 'some');
-            assert.equal(response.text(), 'test');
             assert.equal(response._global_set, 'global');
           } catch (e) {
             done(e)
           }
         });
       xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
-    })
+    });
   })
 });
