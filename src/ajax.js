@@ -84,7 +84,7 @@ export default class Ajax {
       }
     }
 
-    xhr.send(this._request.getDataString());
+    xhr.send(this._request.getBodyString());
   }
 
   createResponse (xhr, url, options) {

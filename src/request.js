@@ -17,6 +17,10 @@ export default class Request {
       async: true
     }, options);
 
+    if (!this._options.body || this._options.data) {
+      this._options.body = this._options.data;
+    }
+
     this.setHeaders();
   }
 
@@ -42,23 +46,23 @@ export default class Request {
     this._options.headers = Object.assign({}, this.getInitHeaders(), this._options.headers, headers);
   }
 
-  getData () {
-    return this._options.data || {};
+  getBody () {
+    return this._options.body || {};
   }
 
-  getDataJson () {
-    return JSON.stringify(this.getData());
+  getBodyJson () {
+    return JSON.stringify(this.getBody());
   }
 
-  getDataForm () {
-    var data = this.getData();
+  getBodyForm () {
+    var data = this.getBody();
     return Object.keys(data)
       .map((key) => `${key}=${encodeURIComponent(data[key])}`)
       .join('&');
   }
 
-  getDataFormData () {
-    var data = this.getData();
+  getBodyFormData () {
+    var data = this.getBody();
     var formData = new FormData();
 
     Object.keys(data)
@@ -73,25 +77,25 @@ export default class Request {
     return formData;
   }
 
-  getDataString () {
+  getBodyString () {
     switch (this._options.sendType) {
       case 'json':
-        return this.getDataJson();
+        return this.getBodyJson();
 
       case 'formData':
-        return this.getDataFormData();
+        return this.getBodyFormData();
 
       default:
-        return this.getDataForm();
+        return this.getBodyForm();
     }
   }
 
-  setData (newData) {
-    this._options.data = Object.assign({}, this._options.data, newData);
+  setBody (newBody) {
+    this._options.body = Object.assign({}, this._options.body, newBody);
   }
 
   getUrl () {
-    return formatUrl(this._url, this.getData());
+    return formatUrl(this._url, this.getBody());
   }
 
   getUrlWithQuery () {
@@ -102,7 +106,7 @@ export default class Request {
   }
 
   getQuery () {
-    var data = this.getData();
+    var data = this.getBody();
     return Object.keys(data).map((key) => {
       return `${key}=${data[key]}`;
     }).join('&');
