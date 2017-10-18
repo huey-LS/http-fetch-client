@@ -19,9 +19,6 @@
   "jsnext:main": "es/index.js",
   "scripts": {
     "test": "npm run build && mocha",
-    "webpack_build": "webpack --config ./webpack.config.js",
-    "webpack_dev": "npm run webpack_build",
-    "webpack": "export NODE_ENV=production || set NODE_ENV=production && npm run webpack_build",
     "clean": "rm -fr dist lib es",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
@@ -47,8 +44,7 @@
     "babel-runtime": "^6.26.0",
     "cross-env": "^5.0.5",
     "mocha": "^3.5.3",
-    "sinon": "^3.2.1",
-    "webpack": "^3.5.5"
+    "sinon": "^3.2.1"
   },
   "dependencies": {}
 }
