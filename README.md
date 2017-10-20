@@ -124,3 +124,42 @@ fetch.post(url[, options])
 fetch.put(url[, options])
 fetch.del(url[, options])
 ```
+
+
+## Response
+### Method
+- text/json/blob
+return formated body
+```js
+fetch.get(...).use((response) => {
+  console.log(response.text())
+})
+```
+- getHeaders
+- isTimeout
+- isAborted
+
+
+## Request
+```js
+new Request(url, options)
+```
+
+### Method
+- getHeaders
+- setHeaders
+- getBody/getBodyForm/getBodyJson/getBodyFormData
+- setBody
+- getUrl/getUrlWithQuery(for GET)
+- getOptions
+- setOptions
+- getMethod
+
+### Options Attribute
+- sendType
+- acceptType
+- async
+- body|data
+- headers
+
+PS: no callback to onsuccess or onerror

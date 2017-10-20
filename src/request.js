@@ -9,6 +9,7 @@ export default class Request {
   }
 
   constructor (url, options) {
+    if (url instanceof Request) return url;
     this._url = url;
     this._options = Object.assign({
       timeout: 20000,

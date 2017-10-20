@@ -23,15 +23,16 @@ class Handles {
   }
 
   start ({ value = [], type = 'success' } = {}) {
-    var handleFns = this.handleQueue
+    let _self = this;
+    let handleFns = this.handleQueue
       .filter((handle) => handle[type])
       .map((handle) => handle[type]);
 
     this.playingHandles[type] = handleFns.map((handle) => {
       if (isGeneratorFunction(handle)) {
-        return handle(...value);
+        return handle.call(_self, ...value);
       } else {
-        var currentFn = function * () { return handle(...value); }
+        var currentFn = function * () { return handle.call(_self, ...value); }
         return currentFn();
       }
     });
@@ -81,15 +82,13 @@ class HandleCreator {
 
 export default class Client {
   _globalHandle = new HandleCreator()
-  request = request.bind(this)
-  get = createBindMethod('GET', this.request)
-  post = createBindMethod('POST', this.request)
-  put = createBindMethod('PUT', this.request)
-  del = createBindMethod('DELETE', this.request)
-
-  constructor () {
-    this.use = this._globalHandle.use.bind(this._globalHandle);
-  }
+  use = this._globalHandle.use.bind(this._globalHandle);
+  request = request
+  requestBind = request.bind(this)
+  get = createBindMethod('GET', this.requestBind)
+  post = createBindMethod('POST', this.requestBind)
+  put = createBindMethod('PUT', this.requestBind)
+  del = createBindMethod('DELETE', this.requestBind)
 }
 
 export function request (...args) {
