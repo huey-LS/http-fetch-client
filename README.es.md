@@ -2,17 +2,17 @@
 [![](https://img.shields.io/travis/ignous/http-fetch-client.svg)](https://travis-ci.org/ignous/http-fetch-client)
 [![npm version](https://img.shields.io/npm/v/http-fetch-client.svg?maxAge=3600)](https://www.npmjs.org/package/http-fetch-client)
 
-浏览器端 fetch client 类， 和一般的fetch不一样哦
+a fetch client for browser
 
-其他语言的README: [简体中文](README.md), [English](README.es.md)
+Read this in other languages: [简体中文](README.md), [English](README.es.md)
 
-## 安装
+## Installation
 ```
 npm install --save http-fetch-client
 ```
 
-## 用法
-发送一个GET请求
+## Usage
+send a request
 ```js
 import FetchClient from 'http-fetch-client';
 
@@ -21,12 +21,12 @@ fetch.request(
   '/test',
   {
     method: 'GET',
-    body: {}
+    data: {}
   }
 )
 ```
 
-### 以中间件方式实现回调
+### use middleware replace callback
 ```js
 import FetchClient from 'http-fetch-client';
 
@@ -40,11 +40,10 @@ fetch.request(...).use((response) => {
 })
 ```
 
-### 添加全局中间件，处理事物
-创建后每次调用`request/get/post/del/pull`请求都会进入
+### set global middleware
+global middleware will be called on every request
 
-PS: 注意，这里是`fetch.use` 而非 `fetch.request(...).use`
-
+PS: global middleware is `fetch use` not `fetch.request(...).use`
 ```js
 import FetchClient from 'http-fetch-client';
 
@@ -58,7 +57,7 @@ fetch.use((response) => {
 })
 ```
 
-### 支持 `async` & `promise` 的中间件～
+### middleware support async & promise
 ```js
 import FetchClient from 'http-fetch-client';
 
@@ -73,7 +72,7 @@ fetch.request(...).use(async (response) => {
 // second;
 ```
 
-### 通过generators实现 中间件级联
+### middleware cascade
 ```js
 import FetchClient from 'http-fetch-client';
 
@@ -95,10 +94,11 @@ fetch.request(...).use(function * (response) {
 // global end
 ```
 
-### 其他周期的中间件支持 ( beforeSend/error/success )
-- beforeSend 发送前，只有全局中间件能起效
-- success 默认项 成功返回了结果 `status !== 0`
-- error `status === 0` 网络错误时候
+### other cycle support ( beforeSend/error/success )
+- beforeSend: before request send. only global middleware
+- error: be called when network error (status === 0)
+- success: status 1 - ...
+
 ```js
 import FetchClient from 'http-fetch-client';
 
@@ -118,7 +118,7 @@ fetch.use({
 }));
 ```
 
-### GET/POST/PUT/DEL RESTful的请求方式
+### REATful api
 ```js
 import FetchClient from 'http-fetch-client';
 
@@ -128,16 +128,12 @@ fetch.post(url[, options])
 fetch.put(url[, options])
 fetch.del(url[, options])
 ```
-等价于
-```js
-fetch.request(url, { method: 'GET'||'POST'||'PUT'||'DELETE'})
-```
 
 
 ## Response
 ### Method
 - text/json/blob
-对返回的内容进行格式化
+return formated body
 ```js
 fetch.get(...).use((response) => {
   console.log(response.text()) // String: test
@@ -145,13 +141,13 @@ fetch.get(...).use((response) => {
 })
 ```
 - getHeaders
-返回response headers
-- isTimeout 返回是否超时
-- isAborted 返回是否取消
+return response headers
+- isTimeout
+- isAborted
 
 ### Attribute
-- status {Number} http状态
-- ok {Boolean} http状态在200-300中间
+- status {Number} http status
+- ok {Boolean} status >= 200 & status < 300
 
 ## Request
 ```js
@@ -160,17 +156,18 @@ new Request(url, options);
 ```
 
 ### Method
-- getHeaders 获取请求头
-- setHeaders 设置请求头
-- getBody/getBodyForm/getBodyJson/getBodyFormData 获取请求body， 并转化为某种格式
-- setBody 设置请求body
-- getUrl/getUrlWithQuery(for GET) 获取url
-- getOptions 获取 options
-- setOptions 设置 options
-- getMethod 获取 method
+- getHeaders
+- setHeaders
+- getBody/getBodyForm/getBodyJson/getBodyFormData
+- setBody
+- getUrl/getUrlWithQuery(for GET)
+- getOptions
+- setOptions
+- getMethod
 
 ### Options Attribute
-- sendType {String} 发送的数据格式，支持 json/form(default)，设置会会自动添加header中的 `Content-Type`
+- sendType {String} quick set `Content-Type` in headers.
+support:
 ``` js
 {
   'json': 'application/json; charset=UTF-8', // default
@@ -178,7 +175,8 @@ new Request(url, options);
 }
 ```
 
-- acceptType {String} 接受的数据格式，支持 json(default)，设置会会自动添加header中的 `Accept`
+- acceptType {String} quick set `accept` in headers.
+support:
 ``` js
 {
   'json': 'application/json,text/javascript' // default
@@ -191,6 +189,5 @@ new Request(url, options);
 
 PS: no callback to onsuccess or onerror
 
-## 例子
-待丰富
+## examples
 [https://github.com/ignous/http-fetch-client-examples](https://github.com/ignous/http-fetch-client-examples)
