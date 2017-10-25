@@ -59,12 +59,37 @@ fetch.use((response) => {
 ```
 
 ### 支持 `async` & `promise` 的中间件～
+- 使用`promise`
+
+PS: Promise reject 会停止后续中间件执行
+```js
+import FetchClient from 'http-fetch-client';
+
+let fetch = new FetchClient();
+fetch.request(...).use((response) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log('first after 1000ms');
+      resolve();
+    }, 1000);
+  })
+}).use((response) => {
+  console.log('second')
+})
+// console
+// first after 1000ms
+// second;
+```
+
+- 使用`async`
 ```js
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
 fetch.request(...).use(async (response) => {
-  return await setTimeout(() => { console.log('first after 1000ms') }, 1000);
+  return await setTimeout(() => {
+    console.log('first after 1000ms');
+  }, 1000);
 }).use((response) => {
   console.log('second')
 })
@@ -93,6 +118,23 @@ fetch.request(...).use(function * (response) {
 // request start
 // request end
 // global end
+```
+
+### 停止后续的中间件执行
+只需要返回`Promise.reject()`
+```js
+import FetchClient from 'http-fetch-client';
+
+let fetch = new FetchClient();
+fetch.request(...).use(function (response) {
+  console.log('first');
+  return Promise.reject();
+});
+fetch.request(...).use(function (response) {
+  console.log('second');
+});
+// console
+// first
 ```
 
 ### 其他周期的中间件支持 ( beforeSend/error/success )

@@ -4,6 +4,7 @@ import isGeneratorFunction from './is-generator-function';
 
 class Handles {
   handleQueue = []
+  catchHandleQueue = []
   playingHandles = {}
   _isEnd = {}
 
@@ -19,6 +20,11 @@ class Handles {
     } else {
       this.handleQueue.push(handle);
     }
+    return this;
+  }
+
+  catch (handle) {
+    this.catchHandleQueue.push(handle);
     return this;
   }
 
@@ -49,22 +55,33 @@ class Handles {
     var len = playingHandles.length;
     for (; i < len; i++) {
       let index = reverse ? (len - i - 1) : i;
-      var handleResult;
       try {
-        handleResult = await playingHandles[index].next();
+        let { done, value } = await playingHandles[index].next();
+        // TODO
+        await Promise.resolve(value);
+        if (done) {
+          playingHandles.splice(i, 1);
+          i--;
+          len--;
+        }
       } catch (e) {
-        handleResult = { value: false };
-      }
-      if (handleResult.value === false) {
         this._isEnd[type] = true;
+        this.playCatchHandle(e);
         return false;
-      } else if (handleResult.done) {
-        playingHandles.splice(i, 1);
-        i--;
-        len--;
       }
     }
     return true;
+  }
+
+  playCatchHandle = async (error) => {
+    let catchHandleQueue = this.catchHandleQueue;
+    let i = 0;
+    let len = catchHandleQueue.length;
+    for (; i < len; i++) {
+      try {
+        await catchHandleQueue[i](error);
+      } catch (e) {}
+    }
   }
 }
 

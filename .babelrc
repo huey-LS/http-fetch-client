@@ -11,9 +11,16 @@
         ["env", { "loose": true, "modules": false }],
         "stage-2"
       ]
+    },
+    "dist": {
+      "presets": [
+        ["env", { "loose": true, "modules": false }],
+        "stage-2"
+      ],
+      "plugins": [
+        "external-helpers",
+        "transform-runtime"
+      ]
     }
-  },
-  "plugins": [
-    "transform-runtime"
-  ]
+  }
 }

@@ -94,6 +94,23 @@ fetch.request(...).use(function * (response) {
 // global end
 ```
 
+### stop next middleware
+need return `Promise.reject()`
+```js
+import FetchClient from 'http-fetch-client';
+
+let fetch = new FetchClient();
+fetch.request(...).use(function (response) {
+  console.log('first');
+  return Promise.reject();
+});
+fetch.request(...).use(function (response) {
+  console.log('second');
+});
+// console
+// first
+```
+
 ### other cycle support ( beforeSend/error/success )
 - beforeSend: before request send. only global middleware
 - error: be called when network error (status === 0)
