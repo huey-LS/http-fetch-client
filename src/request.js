@@ -109,7 +109,7 @@ export default class Request {
   getQuery () {
     var data = this.getBody();
     return Object.keys(data).map((key) => {
-      return `${key}=${data[key]}`;
+      return `${key}=${encodeURIComponent(data[key])}`;
     }).join('&');
   }
 

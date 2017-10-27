@@ -26,6 +26,18 @@ module.exports = function (FetchClient) {
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     })
 
+    it('request body to query with auto encodeURI', () => {
+      fetch
+        .get('http://fake.com', {
+          body: { test: 'a&b' }
+        });
+
+      let { xhr } = getFakeXhr();
+      assert.equal(xhr.requestBody, 'test=a%26b');
+      assert.equal(xhr.url, 'http://fake.com?test=a%26b');
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    })
+
     it('response body to text', (done) => {
       fetch
         .get('http://fake.com')
