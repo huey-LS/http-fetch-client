@@ -4,12 +4,18 @@
       "presets": [
         ["env", { "loose": true }],
         "stage-2"
+      ],
+      "plugins": [
+        "transform-runtime"
       ]
     },
     "es": {
       "presets": [
         ["env", { "loose": true, "modules": false }],
         "stage-2"
+      ],
+      "plugins": [
+        "transform-runtime"
       ]
     },
     "dist": {
