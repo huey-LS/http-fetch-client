@@ -1,6 +1,7 @@
 # http-fetch-client.js
 [![](https://img.shields.io/travis/ignous/http-fetch-client.svg)](https://travis-ci.org/ignous/http-fetch-client)
 [![npm version](https://img.shields.io/npm/v/http-fetch-client.svg?maxAge=3600)](https://www.npmjs.org/package/http-fetch-client)
+[![npm download](https://img.shields.io/npm/dm/http-fetch-client.svg?maxAge=3600)](https://www.npmjs.org/package/http-fetch-client)
 
 a fetch client for browser
 
