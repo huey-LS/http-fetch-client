@@ -5,7 +5,7 @@ import commonjs from 'rollup-plugin-commonjs';
 
 export default {
   name: 'FetchClient',
-  input: 'index.js',
+  input: 'src/index.js',
   output: {
     file: 'dist/http-fetch-client.js',
     format: 'umd'

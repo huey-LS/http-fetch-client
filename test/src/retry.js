@@ -2,7 +2,7 @@ var assert = require('assert');
 
 var getFakeXhr = require('./fake-xhr-creator').getFakeXhr;
 
-module.exports = function (FetchClient) {
+module.exports = function (FetchClient, OtherFetchClient) {
   describe('global auto retry', () => {
     it('retry once', (done) => {
       let fetch = new FetchClient();
@@ -16,14 +16,9 @@ module.exports = function (FetchClient) {
         globalCount++;
         if (response.text() !== 'success') {
           try {
-            assert.equal(response.text(), count + '');
-            let newFetchClient = new FetchClient();
-            // let newFetch = fetch.request.call(null, request);
-            // build all handle
-            this.handleQueue.forEach((handle) => {
-              newFetchClient.use(handle);
-            });
-            newFetchClient.request(request);
+            let requestResult = OtherFetchClient.requestWithoutSend(request);
+            requestResult.handle.use(this.handleQueue);
+            requestResult.send();
             setRespond();
           } catch (e) {
             done(e);

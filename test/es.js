@@ -1,2 +1,3 @@
-var FetchClient = require('../lib/index').default;
-require('./src')('es fetch test', FetchClient);
+var OtherFetchClient = require('../lib/index');
+var FetchClient = OtherFetchClient.default;
+require('./src')('es fetch test', FetchClient, OtherFetchClient);

@@ -1,2 +1,3 @@
-var FetchClient = require('../dist/http-fetch-client').default;
-require('./src')('dist fetch test', FetchClient);
+var OtherFetchClient = require('../dist/http-fetch-client');
+var FetchClient = OtherFetchClient.default;
+require('./src')('dist fetch test', FetchClient, OtherFetchClient);

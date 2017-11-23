@@ -24,7 +24,8 @@
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
     "build:dist": "cross-env BABEL_ENV=dist rollup -c rollup.config.js",
     "build": "npm run clean && npm run build:commonjs && npm run build:es && npm run build:dist",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov -t c8a760ab-1e49-4990-b455-3c0582845f68"
   },
   "prepublish": "",
   "repository": {

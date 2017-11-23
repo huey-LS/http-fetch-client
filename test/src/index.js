@@ -1,13 +1,13 @@
 var createFakeXhr = require('./fake-xhr-creator').createFakeXhr;
 
-module.exports = function (name, FetchClient) {
+module.exports = function (name, FetchClient, OtherFetchClient) {
   describe(name, function () {
     createFakeXhr();
 
-    require('./get')(FetchClient);
-    require('./post')(FetchClient);
-    require('./global')(FetchClient);
-    require('./retry')(FetchClient);
-    require('./catch')(FetchClient);
+    require('./get')(FetchClient, OtherFetchClient);
+    require('./post')(FetchClient, OtherFetchClient);
+    require('./global')(FetchClient, OtherFetchClient);
+    require('./retry')(FetchClient, OtherFetchClient);
+    require('./catch')(FetchClient, OtherFetchClient);
   });
 }
