@@ -1,4 +1,5 @@
-import isGeneratorFunction from './is-generator-function';
+import isGeneratorFunction from 'is-generator-function';
+// var isGeneratorFunction = require('is-generator-function');
 export default class Handles {
   handleQueue = []
   catchHandleQueue = []
