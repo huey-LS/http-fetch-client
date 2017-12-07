@@ -63,16 +63,16 @@ fetch.use((response) => {
 ### 支持 `async` & `promise` 的中间件～
 - 使用`promise`
 
-PS: Promise reject 会停止后续中间件执行
+PS: 需要手动调用next 才能继续执行剩下的中间件
 ```js
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use((response) => {
+fetch.request(...).use((response, request, next) => {
   return new Promise((resolve) => {
     setTimeout(() => {
       console.log('first after 1000ms');
-      resolve();
+      resolve(next());
     }, 1000);
   })
 }).use((response) => {
@@ -88,9 +88,10 @@ fetch.request(...).use((response) => {
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use(async (response) => {
+fetch.request(...).use(async (response, request, next) => {
   return await setTimeout(() => {
     console.log('first after 1000ms');
+    next();
   }, 1000);
 }).use((response) => {
   console.log('second')
@@ -100,19 +101,19 @@ fetch.request(...).use(async (response) => {
 // second;
 ```
 
-### 通过generators实现 中间件级联
+### 通过 async 实现 中间件级联
 ```js
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.use(function * (response) {
+fetch.use(async function (response, request, next) {
   console.log('global start');
-  yield true;
+  await next();
   console.log('global end');
 });
-fetch.request(...).use(function * (response) {
+fetch.request(...).use(async function (response, request, next) {
   console.log('request start');
-  yield true;
+  await next();
   console.log('request end');
 });
 // console
@@ -123,16 +124,14 @@ fetch.request(...).use(function * (response) {
 ```
 
 ### 停止后续的中间件执行
-只需要返回`Promise.reject()`
+返回 `Promise` 或者 使用 `async function` 不执行 `next`
 ```js
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use(function (response) {
+fetch.request(...).use(async function (response) {
   console.log('first');
-  return Promise.reject();
-});
-fetch.request(...).use(function (response) {
+}).use(function (response) {
   console.log('second');
 });
 // console
@@ -162,7 +161,7 @@ fetch.use({
 }));
 ```
 
-### GET/POST/PUT/DEL RESTful的请求方式
+### GET/POST/PUT/DEL RESTful 的请求方式
 ```js
 import FetchClient from 'http-fetch-client';
 

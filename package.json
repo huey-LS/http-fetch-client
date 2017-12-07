@@ -52,7 +52,5 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "sinon": "^3.2.1"
   },
-  "dependencies": {
-    "is-generator-function": "^1.0.6"
-  }
+  "dependencies": {}
 }

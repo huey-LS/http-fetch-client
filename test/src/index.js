@@ -6,6 +6,7 @@ module.exports = function (name, FetchClient, OtherFetchClient) {
 
     require('./get')(FetchClient, OtherFetchClient);
     require('./post')(FetchClient, OtherFetchClient);
+    require('./network-status')(FetchClient, OtherFetchClient);
     require('./global')(FetchClient, OtherFetchClient);
     require('./retry')(FetchClient, OtherFetchClient);
     require('./catch')(FetchClient, OtherFetchClient);

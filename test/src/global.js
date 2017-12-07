@@ -8,10 +8,10 @@ module.exports = function (FetchClient) {
       let fetch = new FetchClient();
       fetch
         .use({
-          beforeSend: (request) => {
+          beforeSend: (response, request) => {
             request.setHeaders({
               'X-Custom-Header': 'some'
-            })
+            });
           }
         });
 
@@ -47,9 +47,9 @@ module.exports = function (FetchClient) {
       let fetch = new FetchClient();
       fetch
         .use({
-          success: function * (response) {
+          success: async function (response, request, next) {
             response._global_set = 'global';
-            yield;
+            await next();
             try {
               assert.equal(response._use_set, 'use');
               done();

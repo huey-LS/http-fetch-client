@@ -1,10 +1,11 @@
 import fetch from './fetch';
 import Request from './request';
-import { HandleCreator } from './handles';
+import Handles, { HandleCreator } from './handles';
 
-export default class Client {
-  _globalHandle = new HandleCreator()
-  use = this._globalHandle.use.bind(this._globalHandle);
+export default class Client extends HandleCreator {
+  // _globalHandle = new HandleCreator()
+  // use = this._globalHandle.use.bind(this._globalHandle);
+  // catch = this._globalHandle.catch.bind(this._globalHandle);
   request = request
   requestBind = request.bind(this)
   get = createBindMethod('GET', this.requestBind)
@@ -17,38 +18,35 @@ export function requestWithoutSend (...args) {
   var fetchRequest = new Request(...args);
 
   var currentHandle;
+  var ctx = {
+    request: fetchRequest
+  };
 
-  if (this instanceof Client && this._globalHandle instanceof HandleCreator) {
-    currentHandle = this._globalHandle.create();
+  if (this instanceof HandleCreator) {
+    currentHandle = this.create();
   } else {
-    currentHandle = (new HandleCreator()).create();
+    currentHandle = new Handles();
   }
 
   currentHandle.start({
-    value: [fetchRequest],
-    type: 'beforeSend'
-  });
-
-  currentHandle.play({
+    ctx: ctx,
     type: 'beforeSend'
   });
 
   function send () {
     return fetch(fetchRequest)
-      .then(async (response) => {
-        currentHandle.start({
-          value: [response, fetchRequest],
+      .then((response) => {
+        ctx.response = response;
+        return currentHandle.start({
+          ctx: ctx,
           type: 'success'
         });
-        await currentHandle.play({ type: 'success' });
-        await currentHandle.play({ type: 'success', reverse: true });
-      }, async (response) => {
-        currentHandle.start({
-          value: [response, fetchRequest],
+      }, (response) => {
+        ctx.response = response;
+        return currentHandle.start({
+          ctx: ctx,
           type: 'error'
         });
-        await currentHandle.play({ type: 'error' });
-        await currentHandle.play({ type: 'error', reverse: true });
       })
   }
 

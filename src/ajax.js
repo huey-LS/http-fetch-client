@@ -21,7 +21,7 @@ export default class Ajax {
       var options = this._request.getOptions();
       var onerror = options.onerror;
       xhr.abort();
-      xhr._hasAborted = true;
+      this._request._hasAborted = true;
       this.applyCallback(xhr, onerror, options);
     }
   }
@@ -29,7 +29,7 @@ export default class Ajax {
   timeout () {
     var xhr = this.xhr;
     if (xhr.readyState !== 4 && !this.end) {
-      xhr._hasTimeout = true;
+      this._request._hasTimeout = true;
       this.abort();
     }
   }
@@ -63,7 +63,7 @@ export default class Ajax {
 
     if (async && timeout > 0) {
       setTimeout(() => {
-        this.abort();
+        this.timeout();
         // delete this.__timer;
       }, timeout);
       xhr.timeout = timeout;

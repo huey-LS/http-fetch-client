@@ -64,8 +64,9 @@ fetch.use((response) => {
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use(async (response) => {
-  return await setTimeout(() => { console.log('first after 1000ms') }, 1000);
+fetch.request(...).use(async (response, request, next) => {
+  await setTimeout(() => { console.log('first after 1000ms') }, 1000);
+  return next();
 }).use((response) => {
   console.log('second')
 })
@@ -79,14 +80,14 @@ fetch.request(...).use(async (response) => {
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.use(function * (response) {
+fetch.use(async function(response, request, next) {
   console.log('global start');
-  yield true;
+  await next();
   console.log('global end');
 });
-fetch.request(...).use(function * (response) {
+fetch.request(...).use(async function (response, request, next) {
   console.log('request start');
-  yield true;
+  await next();
   console.log('request end');
 });
 // console
@@ -97,14 +98,13 @@ fetch.request(...).use(function * (response) {
 ```
 
 ### stop next middleware
-need return `Promise.reject()`
+return `Promise` or use `async function` without run `next()`
 ```js
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use(function (response) {
+fetch.request(...).use(async function (response) {
   console.log('first');
-  return Promise.reject();
 });
 fetch.request(...).use(function (response) {
   console.log('second');

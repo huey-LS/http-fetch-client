@@ -1,65 +1,52 @@
-import isGeneratorFunction from 'is-generator-function';
-// var isGeneratorFunction = require('is-generator-function');
 export default class Handles {
   handleQueue = []
   catchHandleQueue = []
-  playingHandles = {}
-  _isEnd = {}
 
-  constructor (handleQueue) {
+  constructor (handleQueue, catchHandleQueue) {
     this.use(handleQueue);
+    this.catch(catchHandleQueue);
   }
 
   use = useNewHandles.bind(this)
+  catch = catchNewHandles.bind(this)
 
-  catch (handle) {
-    this.catchHandleQueue.push(handle);
-    return this;
-  }
-
-  start ({ value = [], type = 'success' } = {}) {
-    let _self = this;
+  start ({ ctx = {}, type = 'success' } = {}) {
     let handleFns = this.handleQueue
       .filter((handle) => handle[type])
       .map((handle) => handle[type]);
 
-    this.playingHandles[type] = handleFns.map((handle) => {
-      if (isGeneratorFunction(handle)) {
-        return handle.call(_self, ...value);
-      } else {
-        var currentFn = function * () { return handle.call(_self, ...value); }
-        return currentFn();
-      }
-    });
-
-    this._isEnd[type] = false;
-
-    return this;
+    return this.play(handleFns)(ctx)
+      .catch(this.playCatchHandle)
   }
 
-  play = async ({ reverse, type = 'success' } = {}) => {
-    var playingHandles = this.playingHandles[type];
-    if (!playingHandles || this._isEnd[type]) return false;
-    var i = 0;
-    var len = playingHandles.length;
-    for (; i < len; i++) {
-      let index = reverse ? (len - i - 1) : i;
+  play = (middleware) => (ctx, next) => {
+    let _self = this;
+    let index = -1;
+    return dispatch(0)
+    function dispatch (i) {
+      let fn = middleware[i];
+      if (i <= index) {
+        return Promise.reject(new Error('next() called multiple times'))
+      }
+      index = i;
+      if (i === middleware.length) fn = next;
+      if (!fn) return Promise.resolve();
+      let value;
       try {
-        let { done, value } = await playingHandles[index].next();
-        // TODO
-        await Promise.resolve(value);
-        if (done) {
-          playingHandles.splice(i, 1);
-          i--;
-          len--;
-        }
+        value = fn.call(_self, ctx.response, ctx.request, () => {
+          return dispatch(i + 1);
+        });
       } catch (e) {
-        this._isEnd[type] = true;
-        this.playCatchHandle(e);
-        return false;
+        return Promise.reject(e);
+      }
+      if (isPromise(value)) {
+        return value;
+      } else if (i === index) {
+        return Promise.resolve(dispatch(i + 1));
+      } else {
+        return Promise.resolve(value);
       }
     }
-    return true;
   }
 
   playCatchHandle = async (error) => {
@@ -67,20 +54,14 @@ export default class Handles {
     let i = 0;
     let len = catchHandleQueue.length;
     for (; i < len; i++) {
-      try {
-        await catchHandleQueue[i](error);
-      } catch (e) {}
+      await catchHandleQueue[i](error);
     }
   }
 }
 
-export class HandleCreator {
-  handleQueue = []
-
-  use = useNewHandles.bind(this);
-
+export class HandleCreator extends Handles {
   create () {
-    return new Handles(this.handleQueue);
+    return new Handles(this);
   }
 }
 
@@ -101,4 +82,25 @@ function useNewHandles (handle) {
   }
 
   return this;
+}
+
+function catchNewHandles (handle) {
+  let handles;
+  if (handle) {
+    if (handle instanceof Handles) {
+      handles = handle.catchHandleQueue;
+    } else if (Array.isArray(handle)) {
+      handles = handle;
+    } else if (typeof handle === 'function') {
+      handles = [handle];
+    }
+
+    this.catchHandleQueue = [...this.catchHandleQueue, ...handles]
+  }
+
+  return this;
+}
+
+function isPromise (obj) {
+  return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
 }

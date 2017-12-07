@@ -16,9 +16,11 @@ module.exports = function (FetchClient, OtherFetchClient) {
         globalCount++;
         if (response.text() !== 'success') {
           try {
-            let requestResult = OtherFetchClient.requestWithoutSend(request);
-            requestResult.handle.use(this.handleQueue);
-            requestResult.send();
+            // create fetch task without handles
+            let { send, handle } = OtherFetchClient.requestWithoutSend(request);
+            // set handles
+            handle.use(this);
+            send();
             setRespond();
           } catch (e) {
             done(e);
