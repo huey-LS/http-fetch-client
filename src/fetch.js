@@ -1,4 +1,4 @@
-import Ajax from './ajax';
+import adapter from './adapters';
 
 export default function fetch (...args) {
   var _resolve, _reject;
@@ -7,9 +7,8 @@ export default function fetch (...args) {
     _reject = reject;
   });
 
-  var ajax = new Ajax(...args);
-
-  ajax._request.setOptions({
+  adapter({
+    ...args,
     onsuccess: function (response) {
       return _resolve(response);
     },
@@ -23,8 +22,6 @@ export default function fetch (...args) {
       }
     }
   })
-
-  ajax.send();
 
   return p;
 }

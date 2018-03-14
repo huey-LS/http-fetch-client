@@ -1,5 +1,5 @@
 import fetch from './fetch';
-import Request from './request';
+import Request from './core/request';
 import Handles, { HandleCreator } from './handles';
 
 export default class Client extends HandleCreator {
