@@ -14,8 +14,16 @@ export default class Client extends HandleCreator {
   del = createBindMethod('DELETE', this.requestBind)
 }
 
-export function requestWithoutSend (...args) {
-  var fetchRequest = new Request(...args);
+export function requestWithoutSend (url, options) {
+  var fetchRequest;
+  if ('string' === typeof url) {
+    fetchRequest = new Request({
+      url,
+      ...options
+    });
+  } else {
+    fetchRequest = new Request(url);
+  }
 
   var currentHandle;
   var ctx = {

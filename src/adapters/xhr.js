@@ -1,20 +1,17 @@
 import Request from '../core/request';
 import Response from '../core/response';
 
-export default function ajax (options) {
-  let request = new Request(options);
-
+export default function ajax (request, options) {
   var method = request.getMethod();
   var headers = request.getHeaders();
   var body = request.getBody();
   var url = request.getURL();
+  var async = request.async;
+  var timeout = request.timeout;
 
   var {
-    async,
-    timeout,
     onerror,
-    onsuccess,
-    responseType
+    onsuccess
   } = options;
 
   var xhr = createXMLHttpRequest();
@@ -23,9 +20,9 @@ export default function ajax (options) {
   xhr.method = method;
   xhr.url = url;
 
-  if (responseType) {
-    xhr.responseType = responseType;
-  }
+  // if (responseType) {
+  //   xhr.responseType = responseType;
+  // }
 
   if (async && timeout > 0) {
     setTimeout(() => {
@@ -42,9 +39,9 @@ export default function ajax (options) {
     if (xhr.readyState === 4) {
       xhr.end = true;
       if (xhr.status >= 200 && xhr.status < 300) {
-        applyCallback(xhr, onsuccess);
+        applyCallback(onsuccess, xhr);
       } else {
-        applyCallback(xhr, onerror);
+        applyCallback(onerror, xhr);
       }
     }
   }
@@ -52,7 +49,7 @@ export default function ajax (options) {
   xhr.send(body);
 
   xhr._abort = xhr.abort;
-  xhr.abort = abort(xhr);
+  xhr.abort = abort(xhr, onerror);
 
   return xhr;
 }
@@ -61,7 +58,7 @@ function createXMLHttpRequest () {
   return new XMLHttpRequest();
 }
 
-function applyCallback (callback, xhr) {
+function applyCallback (xhr, callback) {
   typeof callback === 'function' &&
     callback(new Response({
       url: xhr.url,
@@ -71,12 +68,12 @@ function applyCallback (callback, xhr) {
     }))
 }
 
-function abort (xhr) {
+function abort (xhr, onerror) {
   if (xhr.readyState !== 4 && !xhr.end) {
     xhr.end = true;
     xhr._abort();
     xhr.aborted = true;
-    applyCallback(onerror, xhr);
+    applyCallback(xhr, onerror);
   }
 }
 

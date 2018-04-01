@@ -12,31 +12,46 @@ export default class Request extends Message {
 
   static defaultOptions = {
     timeout: 20000,
-    sendType: 'form',
-    acceptType: 'json',
+    type: 'form',
+    accept: 'json',
     async: true
   }
 
   constructor (opts) {
+    opts = format(opts)
     super(opts);
-    this._options = opts;
-    let initHeaders = this.getInitHeaders();
-    this.setHeaders(initHeaders);
+    this.async = opts.async;
+    this.timeout = opts.timeout;
+  }
+}
+
+function format (opts) {
+  let newOpts = {
+    ...Request.defaultOptions,
+    ...opts
+  };
+  newOpts.headers = {
+    ...getInitHeaders(newOpts),
+    ...newOpts.headers
+  };
+  return newOpts;
+}
+
+function getInitHeaders ({
+  type = 'form',
+  accept = 'form'
+}) {
+  let initHeaders = {};
+  let contentType = Request.sendTypeMap[type];
+  if (contentType) {
+    initHeaders['Content-Type'] = contentType;
   }
 
-  getInitHeaders () {
-    let initHeaders = {};
-    let contentType = Request.sendTypeMap[this._options.sendType];
-    if (contentType) {
-      initHeaders['Content-Type'] = contentType;
-    }
-
-    let accept = Request.acceptTypeMap[this._options.acceptType];
-    if (accept) {
-      initHeaders['Accept'] = accept;
-    }
-    return initHeaders;
+  let acceptType = Request.acceptTypeMap[accept];
+  if (acceptType) {
+    initHeaders['Accept'] = acceptType;
   }
+  return initHeaders;
 }
 
 // function formatUrl (url, data) {

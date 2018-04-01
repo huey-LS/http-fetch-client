@@ -11,20 +11,23 @@ module.exports = function (FetchClient) {
 
       let { xhr } = getFakeXhr();
       assert.equal(xhr.method, 'GET')
+      console.log(xhr);
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     });
 
     it('request body to query', () => {
       fetch
         .get('http://fake.com', {
-          body: data
+          query: data
         });
 
       let { xhr } = getFakeXhr();
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
       assert.equal(xhr.requestBody, 'test=abc');
       assert.equal(xhr.url, 'http://fake.com?test=abc');
-      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     })
+
+    return 1;
 
     it('request body to url', () => {
       fetch

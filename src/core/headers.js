@@ -38,7 +38,13 @@ export default class Headers {
   set = this.append
 
   get (name) {
-    return this._headers[name];
+    if (name) {
+      return this._headers[name];
+    }
+  }
+
+  getAll () {
+    return this._headers;
   }
 
   has (name) {

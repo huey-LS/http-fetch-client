@@ -18,11 +18,21 @@ export default class Message {
    * @param {any} opts.body
    * @memberof Message
    */
-  constructor ({ url, method, headers, body }) {
+  constructor ({
+    url,
+    method = 'GET',
+    headers,
+    query,
+    body,
+    type
+  }) {
     this.url = new URL(url);
-    this.headers = new Headers(headers);
-    this.body = new Body(body);
-    this.setMethod(method || 'GET');
+    if (query) {
+      this.url.set('query', query);
+    }
+    this.headers = new Headers(headers, { type });
+    this.body = new Body(body, { type });
+    this.setMethod(method);
   }
 
   // alias get for url
@@ -42,7 +52,7 @@ export default class Message {
 
   // alias get/set for headers
   getHeaders () {
-    return this.headers.get();
+    return this.headers.getAll();
   }
   setHeaders (headers) {
     return this.headers.set(headers);
@@ -50,7 +60,7 @@ export default class Message {
 
   // alias get/set for body
   getBody () {
-    return this.body.get();
+    return this.body.format();
   }
   setBody (body) {
     return this.body.set(body);
