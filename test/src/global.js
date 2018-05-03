@@ -8,15 +8,14 @@ module.exports = function (FetchClient) {
       let fetch = new FetchClient();
       fetch
         .use({
-          beforeSend: (response, request) => {
+          beforeSend: ({ request }) => {
             request.setHeaders({
               'X-Custom-Header': 'some'
             });
           }
         });
 
-      fetch
-        .get('http://fake.com');
+      fetch.get('http://fake.com');
 
       let { xhr } = getFakeXhr();
       assert.equal(xhr.requestHeaders['X-Custom-Header'], 'some');
@@ -27,9 +26,10 @@ module.exports = function (FetchClient) {
       let fetch = new FetchClient();
       fetch
         .use({
-          success: (response) => {
+          success: ({ response }) => {
             try {
-              assert.equal(response.text(), 'test');
+              assert.equal(response.getBody(), 'test');
+              assert.equal(response.body.text(), 'test');
               done();
             } catch (e) {
               done(e)
@@ -47,11 +47,11 @@ module.exports = function (FetchClient) {
       let fetch = new FetchClient();
       fetch
         .use({
-          success: async function (response, request, next) {
-            response._global_set = 'global';
+          success: async function (ctx, next) {
+            ctx._global_set = 'global';
             await next();
             try {
-              assert.equal(response._use_set, 'use');
+              assert.equal(ctx._use_set, 'use');
               done();
             } catch (e) {
               done(e)
@@ -61,10 +61,10 @@ module.exports = function (FetchClient) {
 
       fetch
         .get('http://fake.com')
-        .use((response) => {
-          response._use_set = 'use';
+        .use((ctx) => {
+          ctx._use_set = 'use';
           try {
-            assert.equal(response._global_set, 'global');
+            assert.equal(ctx._global_set, 'global');
           } catch (e) {
             done(e)
           }
@@ -73,5 +73,30 @@ module.exports = function (FetchClient) {
       let { xhr } = getFakeXhr();
       xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
     });
+
+    it('use array handle', (done) => {
+      let fetch = new FetchClient();
+      fetch.use([
+        {
+          'beforeSend': ({ request }) => {
+            request.setHeaders({
+              'X-Custom-Header': 'some'
+            });
+          }
+        },
+        function ({ response }) {
+          try {
+            assert.equal(response.body.text(), 'test');
+            done();
+          } catch (e) {
+            done(e);
+          }
+        }
+      ]);
+      fetch.get('http://fake.com');
+      let { xhr } = getFakeXhr();
+      assert.equal(xhr.requestHeaders['X-Custom-Header'], 'some');
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
+    })
   })
 }

@@ -29,44 +29,14 @@ module.exports = function (FetchClient) {
       fetch
         .post('http://fake.com', {
           body: data,
-          sendType: 'json'
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
 
       let { xhr } = getFakeXhr();
       assert.equal(xhr.requestBody, JSON.stringify(data));
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
-    })
-
-    it('response body to text', (done) => {
-      fetch
-        .post('http://fake.com')
-        .use((response) => {
-          try {
-            assert.equal(response.text(), 'test');
-            done();
-          } catch (e) {
-            done(e)
-          }
-        });
-
-      let { xhr } = getFakeXhr();
-      xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
-    })
-
-    it('response body to json', (done) => {
-      fetch
-        .post('http://fake.com')
-        .use((response) => {
-          try {
-            assert.deepEqual(response.json(), data);
-            done();
-          } catch (e) {
-            done(e)
-          }
-        });
-
-      let { xhr } = getFakeXhr();
-      xhr.respond(200, { 'Content-Type': 'text/plain' }, JSON.stringify(data));
     })
   })
 }

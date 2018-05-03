@@ -4,10 +4,11 @@ import Response from '../core/response';
 export default function ajax (request, options) {
   var method = request.getMethod();
   var headers = request.getHeaders();
-  var body = request.getBody();
+  var body = request.getBodyStringify();
   var url = request.getURL();
   var async = request.async;
   var timeout = request.timeout;
+  var responseType = request.responseType;
 
   var {
     onerror,
@@ -20,14 +21,14 @@ export default function ajax (request, options) {
   xhr.method = method;
   xhr.url = url;
 
-  // if (responseType) {
-  //   xhr.responseType = responseType;
-  // }
+  if (responseType) {
+    xhr.responseType = responseType;
+  }
 
   if (async && timeout > 0) {
-    setTimeout(() => {
-      cancel(xhr);
-    }, timeout);
+    // setTimeout(() => {
+    //   cancel(xhr, onerror, request);
+    // }, timeout);
     xhr.timeout = timeout;
   }
 
@@ -39,47 +40,56 @@ export default function ajax (request, options) {
     if (xhr.readyState === 4) {
       xhr.end = true;
       if (xhr.status >= 200 && xhr.status < 300) {
-        applyCallback(onsuccess, xhr);
+        applyCallback(xhr, onsuccess);
       } else {
-        applyCallback(onerror, xhr);
+        applyCallback(xhr, onerror);
       }
+    } else if (xhr.readyState < 2 && xhr.status > 0) {
+      applyCallback(xhr, onerror);
     }
   }
 
   xhr.send(body);
 
   xhr._abort = xhr.abort;
-  xhr.abort = abort(xhr, onerror);
+  xhr.abort = createAbort(xhr, onerror, request);
 
   return xhr;
 }
 
 function createXMLHttpRequest () {
-  return new XMLHttpRequest();
+  return new window.XMLHttpRequest();
 }
 
 function applyCallback (xhr, callback) {
   typeof callback === 'function' &&
     callback(new Response({
       url: xhr.url,
-      body: xhr.response,
-      headers: xhr.getAllResponseHeaders,
-      method: xhr.method
+      body: xhr.response || xhr.responseText,
+      headers: xhr.getAllResponseHeaders(),
+      method: xhr.method,
+      status: xhr.status,
+      readyState: xhr.readyState
     }))
 }
 
-function abort (xhr, onerror) {
-  if (xhr.readyState !== 4 && !xhr.end) {
-    xhr.end = true;
-    xhr._abort();
-    xhr.aborted = true;
-    applyCallback(xhr, onerror);
+function createAbort (xhr, onerror, request) {
+  return function () {
+    if (xhr.readyState !== 4 && !xhr.end) {
+      xhr.end = true;
+      xhr._abort();
+      xhr.aborted = true;
+      request.aborted = true;
+      applyCallback(xhr, onerror);
+    }
   }
 }
 
-function cancel (xhr) {
+function cancel (xhr, onerror, request) {
   if (xhr.readyState !== 4 && !xhr.end) {
     xhr.canceled = true;
     xhr.end = true;
+    request.canceled = true;
+    applyCallback(xhr, onerror);
   }
 }

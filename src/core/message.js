@@ -1,5 +1,5 @@
 import URL from 'url-parse';
-import Headers from './headers';
+import Header from './header';
 import Body from './body';
 
 /**
@@ -30,8 +30,8 @@ export default class Message {
     if (query) {
       this.url.set('query', query);
     }
-    this.headers = new Headers(headers, { type });
-    this.body = new Body(body, { type });
+    this.header = new Header(headers);
+    this.body = new Body(body);
     this.setMethod(method);
   }
 
@@ -52,16 +52,23 @@ export default class Message {
 
   // alias get/set for headers
   getHeaders () {
-    return this.headers.getAll();
+    return this.header.getAll();
   }
   setHeaders (headers) {
-    return this.headers.set(headers);
+    return this.header.set(headers);
   }
 
   // alias get/set for body
   getBody () {
-    return this.body.format();
+    let formatType = this.header.getContentFormatType();
+    return this.body.format(formatType);
   }
+
+  getBodyStringify () {
+    let formatType = this.header.getContentFormatType();
+    return this.body.formatStringify(formatType);
+  }
+
   setBody (body) {
     return this.body.set(body);
   }

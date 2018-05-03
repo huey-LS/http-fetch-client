@@ -33,7 +33,7 @@ export default class Handles {
       if (!fn) return Promise.resolve();
       let value;
       try {
-        value = fn.call(_self, ctx.response, ctx.request, () => {
+        value = fn.call(_self, ctx, () => {
           return dispatch(i + 1);
         });
       } catch (e) {
@@ -71,7 +71,13 @@ function useNewHandles (handle) {
     if (handle instanceof Handles) {
       handles = handle.handleQueue;
     } else if (Array.isArray(handle)) {
-      handles = handle;
+      handles = handle.map((item) => {
+        if (typeof item === 'function') {
+          return { success: item };
+        } else {
+          return item;
+        }
+      });
     } else if (typeof handle === 'function') {
       handles = [{ success: handle }];
     } else {

@@ -1,12 +1,17 @@
+import {
+  alias
+} from '../utils/decorators';
+import { getFormatType } from '../utils/content-type';
+
 /**
  * Headers
  * @export
  * @class Headers
  */
-export default class Headers {
+export default class Header {
   /**
    * Creates an instance of Headers.
-   * @param {string|Object} headers
+   * @param {string|Object} Header
    * @memberof Headers
    */
   constructor (headers) {
@@ -19,23 +24,30 @@ export default class Headers {
     }
   }
 
-  parse (headersString) {
-    if (typeof headersString === 'string') {
-      return headersString
-        .split(/\n/)
-        .reduce((headers, headerString) => {
-          let [key, val] = headerString.split(':');
+  parse (headers) {
+    if (typeof headers === 'string') {
+      return headers
+        .split(/\r\n|\n/)
+        .reduce((headers, header) => {
+          let [ key, val ] = header.split(':');
           if (key && val) {
             headers[key.trim()] = val.trim();
           }
+          return headers;
         }, {});
+    } else {
+      return headers;
     }
   }
 
+  @alias('set')
   append (name, value) {
-    this._headers[name] = value;
+    if (typeof name === 'string' && value) {
+      this._headers[name] = value;
+    } else {
+      this._headers = Object.assign(this._headers, name);
+    }
   }
-  set = this.append
 
   get (name) {
     if (name) {
@@ -49,6 +61,10 @@ export default class Headers {
 
   has (name) {
     return typeof this.get(name) !== 'undefined';
+  }
+
+  getContentFormatType () {
+    return getFormatType(this.get('Content-Type'));
   }
 
   toString () {

@@ -1,62 +1,55 @@
 import Message from './message';
+import createContentType, {
+  FORMAT_FORM,
+  FORMAT_TEXT,
+  MEDIA_APPLICATION,
+  MEDIA_TEXT
+} from '../utils/content-type';
+
+const defaultOptions = {
+  timeout: 20000,
+  type: 'form',
+  accept: 'json',
+  async: true
+}
+
+const defaultHeaders = {
+  'Content-Type': createContentType({
+    MIMEType: {
+      type: MEDIA_APPLICATION,
+      format: FORMAT_FORM
+    }
+  }),
+  'Accept': createContentType({
+    MIMEType: {
+      media: MEDIA_TEXT,
+      format: FORMAT_TEXT
+    }
+  })
+}
 
 export default class Request extends Message {
-  static sendTypeMap = {
-    'json': 'application/json; charset=UTF-8',
-    'form': 'application/x-www-form-urlencoded; charset=UTF-8'
-  }
-
-  static acceptTypeMap = {
-    'json': 'application/json,text/javascript'
-  }
-
-  static defaultOptions = {
-    timeout: 20000,
-    type: 'form',
-    accept: 'json',
-    async: true
-  }
-
   constructor (opts) {
-    opts = format(opts)
+    // opts = format(opts)
+    opts = {
+      ...defaultOptions,
+      ...opts
+    }
+    opts.headers = {
+      ...defaultHeaders,
+      ...opts.headers
+    }
     super(opts);
     this.async = opts.async;
     this.timeout = opts.timeout;
-  }
-}
-
-function format (opts) {
-  let newOpts = {
-    ...Request.defaultOptions,
-    ...opts
-  };
-  newOpts.headers = {
-    ...getInitHeaders(newOpts),
-    ...newOpts.headers
-  };
-  return newOpts;
-}
-
-function getInitHeaders ({
-  type = 'form',
-  accept = 'form'
-}) {
-  let initHeaders = {};
-  let contentType = Request.sendTypeMap[type];
-  if (contentType) {
-    initHeaders['Content-Type'] = contentType;
+    this.responseType = opts.responseType;
   }
 
-  let acceptType = Request.acceptTypeMap[accept];
-  if (acceptType) {
-    initHeaders['Accept'] = acceptType;
+  getBody () {
+    if (this.method === 'GET') {
+      return '';
+    } else {
+      return Message.prototype.getBody.call(this);
+    }
   }
-  return initHeaders;
 }
-
-// function formatUrl (url, data) {
-//   if (typeof url !== 'string' || !data) return url;
-//   return url.replace(/\{(\w+)\}/g, function (searchValue, key) {
-//     if (typeof data[key] !== 'undefined') return data[key];
-//   });
-// }
