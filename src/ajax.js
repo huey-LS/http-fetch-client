@@ -40,7 +40,7 @@ export default class Ajax {
     var headers = this._request.getHeaders();
     var url;
     if (method === 'GET') {
-      url = this._request.getUrlWithQuery();
+      url = this._request.getUrlWithBody();
     } else {
       url = this._request.getUrl();
     }

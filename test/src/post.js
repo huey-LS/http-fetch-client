@@ -14,6 +14,17 @@ module.exports = function (FetchClient) {
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     });
 
+    it('request with query', () => {
+      fetch.post('http://fake.com', {
+        query: { a: 1 }
+      });
+
+      let { xhr } = getFakeXhr();
+      assert.equal(xhr.method, 'POST')
+      assert.equal(xhr.url, 'http://fake.com?a=1');
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    });
+
     it('request form body', () => {
       fetch
         .post('http://fake.com', {

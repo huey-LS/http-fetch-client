@@ -96,21 +96,21 @@ export default class Request {
   }
 
   getUrl () {
-    return formatUrl(this._url, this.getBody());
+    let baseUrl = formatUrl(this._url, this.getBody());
+    let query = formatQuery(this.getQuery());
+    query = query ? '?' + query : '';
+    return `${baseUrl}${query}`;
   }
 
-  getUrlWithQuery () {
-    var baseUrl = this.getUrl();
-    var query = this.getQuery();
+  getUrlWithBody () {
+    let baseUrl = formatUrl(this._url, this.getBody());
+    var query = formatQuery({ ...this.getBody(), ...this.getQuery()});
     query = query ? '?' + query : '';
     return `${baseUrl}${query}`;
   }
 
   getQuery () {
-    var data = this.getBody();
-    return Object.keys(data).map((key) => {
-      return `${key}=${encodeURIComponent(data[key])}`;
-    }).join('&');
+    return this._options.query || {};
   }
 
   getOptions () {
@@ -127,6 +127,15 @@ export default class Request {
     method = method.toUpperCase();
     return method;
   }
+}
+
+function formatQuery (query) {
+  if (query) {
+    return Object.keys(query).map((key) => {
+      return `${key}=${encodeURIComponent(query[key])}`;
+    }).join('&');
+  }
+  return '';
 }
 
 function formatUrl (url, data) {
