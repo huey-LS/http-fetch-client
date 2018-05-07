@@ -67,7 +67,7 @@ let fetch = new FetchClient();
 fetch.request(...).use(async ({ response, request }, next) => {
   await setTimeout(() => { console.log('first after 1000ms') }, 1000);
   return next();
-}).use((response) => {
+}).use(({ response }) => {
   console.log('second')
 })
 // console

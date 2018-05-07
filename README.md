@@ -33,7 +33,7 @@ fetch.request(
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use((response) => {
+fetch.request(...).use(({ response }) => {
   if (response.ok) {
     //  response.status in 200 - 300
   } else {
@@ -51,7 +51,7 @@ PS: 注意，这里是`fetch.use` 而非 `fetch.request(...).use`
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.use((response) => {
+fetch.use(({ response }) => {
   if (response.ok) {
     //  response.status in 200 - 300
   } else {
@@ -68,14 +68,14 @@ PS: 需要手动调用next 才能继续执行剩下的中间件
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use((response, request, next) => {
+fetch.request(...).use(({ response, request }, next) => {
   return new Promise((resolve) => {
     setTimeout(() => {
       console.log('first after 1000ms');
       resolve(next());
     }, 1000);
   })
-}).use((response) => {
+}).use(({ response }) => {
   console.log('second')
 })
 // console
@@ -93,7 +93,7 @@ fetch.request(...).use(async ({ response, request }, next) => {
     console.log('first after 1000ms');
     next();
   }, 1000);
-}).use((response) => {
+}).use(({ response }) => {
   console.log('second')
 })
 // console
@@ -131,7 +131,7 @@ import FetchClient from 'http-fetch-client';
 let fetch = new FetchClient();
 fetch.request(...).use(async function ({ response }) {
   console.log('first');
-}).use(function (response) {
+}).use(function ({ response }) {
   console.log('second');
 });
 // console
