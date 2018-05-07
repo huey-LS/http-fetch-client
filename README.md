@@ -88,7 +88,7 @@ fetch.request(...).use((response, request, next) => {
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use(async (response, request, next) => {
+fetch.request(...).use(async ({ response, request }, next) => {
   return await setTimeout(() => {
     console.log('first after 1000ms');
     next();
@@ -106,12 +106,12 @@ fetch.request(...).use(async (response, request, next) => {
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.use(async function (response, request, next) {
+fetch.use(async function ({ response, request }, next) {
   console.log('global start');
   await next();
   console.log('global end');
 });
-fetch.request(...).use(async function (response, request, next) {
+fetch.request(...).use(async function ({ response, request }, next) {
   console.log('request start');
   await next();
   console.log('request end');
@@ -129,7 +129,7 @@ fetch.request(...).use(async function (response, request, next) {
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use(async function (response) {
+fetch.request(...).use(async function ({ response }) {
   console.log('first');
 }).use(function (response) {
   console.log('second');
@@ -147,15 +147,13 @@ import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
 fetch.use({
-  beforeSend: (request) => {
-    request.setHeaders({
-      'X-Custom-Header': 'some'
-    })
+  beforeSend: ({ request }) => {
+    request.header.set('X-Custom-Header', 'some');
   },
-  error: (response, request) => {
+  error: ({ response, request }) => {
     // ...
   },
-  success: (response, request) => {
+  success: ({ response, request }) => {
     // ...
   }
 }));
@@ -182,7 +180,8 @@ fetch.request(url, { method: 'GET'||'POST'||'PUT'||'DELETE'})
 - text/json/blob
 对返回的内容进行格式化
 ```js
-fetch.get(...).use((response) => {
+fetch.get(...).use(({ response }) => {
+  console.log(response.getBody()) // 根据 response header 的 Content-Type 自动格式化
   console.log(response.text()) // String: test
   console.log(response.json()) // Object: {a:'..'}
 })

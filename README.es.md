@@ -33,7 +33,7 @@ fetch.request(
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use((response) => {
+fetch.request(...).use(({ response }) => {
   if (response.ok) {
     //  response.status in 200 - 300
   } else {
@@ -50,7 +50,7 @@ PS: global middleware is `fetch use` not `fetch.request(...).use`
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.use((response) => {
+fetch.use(({ response }) => {
   if (response.ok) {
     //  response.status in 200 - 300
   } else {
@@ -64,7 +64,7 @@ fetch.use((response) => {
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use(async (response, request, next) => {
+fetch.request(...).use(async ({ response, request }, next) => {
   await setTimeout(() => { console.log('first after 1000ms') }, 1000);
   return next();
 }).use((response) => {
@@ -80,12 +80,12 @@ fetch.request(...).use(async (response, request, next) => {
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.use(async function(response, request, next) {
+fetch.use(async function({ response, request }, next) {
   console.log('global start');
   await next();
   console.log('global end');
 });
-fetch.request(...).use(async function (response, request, next) {
+fetch.request(...).use(async function ({ response, request }, next) {
   console.log('request start');
   await next();
   console.log('request end');
@@ -103,10 +103,10 @@ return `Promise` or use `async function` without run `next()`
 import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
-fetch.request(...).use(async function (response) {
+fetch.request(...).use(async function ({ response }) {
   console.log('first');
 });
-fetch.request(...).use(function (response) {
+fetch.request(...).use(function ({ response }) {
   console.log('second');
 });
 // console
@@ -123,15 +123,13 @@ import FetchClient from 'http-fetch-client';
 
 let fetch = new FetchClient();
 fetch.use({
-  beforeSend: (request) => {
-    request.setHeaders({
-      'X-Custom-Header': 'some'
-    })
+  beforeSend: ({ request }) => {
+    request.header.set('X-Custom-Header', 'some');
   },
-  error: (response, request) => {
+  error: ({ response, request }) => {
     // ...
   },
-  success: (response, request) => {
+  success: ({ response, request }) => {
     // ...
   }
 }));
@@ -154,7 +152,8 @@ fetch.del(url[, options])
 - text/json/blob
 return formated body
 ```js
-fetch.get(...).use((response) => {
+fetch.get(...).use(({ response }) => {
+  console.log(response.getBody()) // auto format by Content-Type in response's header
   console.log(response.text()) // String: test
   console.log(response.json()) // Object: {a:'..'}
 })
