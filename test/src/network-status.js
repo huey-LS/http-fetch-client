@@ -9,7 +9,7 @@ module.exports = function (FetchClient) {
       fetch
         .get('http://fake.com')
         .use({
-          error: (response) => {
+          error: ({ response }) => {
             try {
               assert.equal(response.ok, false);
               assert.equal(response.status, 0);
@@ -28,7 +28,7 @@ module.exports = function (FetchClient) {
       fetch
         .get('http://fake.com')
         .use({
-          success: (response) => {
+          success: ({ response }) => {
             try {
               assert.equal(response.ok, true);
               assert.equal(response.status, 200);
@@ -47,7 +47,7 @@ module.exports = function (FetchClient) {
       fetch
         .get('http://fake.com')
         .use({
-          success: (response) => {
+          success: ({ response }) => {
             try {
               assert.equal(response.ok, false);
               assert.equal(response.status, 500);
@@ -68,12 +68,13 @@ module.exports = function (FetchClient) {
           timeout: 10
         })
         .use({
-          error: (response, request) => {
+          success: () => {
+            console.log('in success')
+          },
+          error: ({ response, request }) => {
             try {
-              assert.equal(response.ok, false);
-              // assert.equal(request._xhr._hasAborted, true);
-              assert.equal(request._hasTimeout, true);
-              assert.equal(request._hasAborted, true);
+              assert.equal(response.isConnectSuccess(), true);
+              assert.equal(response.isTimeout(), true);
               done();
             } catch (e) {
               done(e);

@@ -6,6 +6,7 @@
         "stage-2"
       ],
       "plugins": [
+        "transform-decorators-legacy",
         "transform-runtime"
       ]
     },
@@ -15,6 +16,7 @@
         "stage-2"
       ],
       "plugins": [
+        "transform-decorators-legacy",
         "transform-runtime"
       ]
     },
@@ -24,6 +26,7 @@
         "stage-2"
       ],
       "plugins": [
+        "transform-decorators-legacy",
         "external-helpers",
         "transform-runtime"
       ]

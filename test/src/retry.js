@@ -11,10 +11,10 @@ module.exports = function (FetchClient, OtherFetchClient) {
       let globalCount = 0;
       let normalCount = 0;
 
-      fetch.use(function (response, request) {
+      fetch.use(function ({ response, request }) {
         // this instanceof Handles
         globalCount++;
-        if (response.text() !== 'success') {
+        if (response.getBody() !== 'success') {
           try {
             // create fetch task without handles
             let { send, handle } = OtherFetchClient.requestWithoutSend(request);
@@ -31,10 +31,10 @@ module.exports = function (FetchClient, OtherFetchClient) {
 
       fetch
         .get('http://fake.com')
-        .use((response) => {
+        .use(({ response }) => {
           normalCount++;
           try {
-            assert.equal(response.text(), 'success');
+            assert.equal(response.getBody(), 'success');
             assert.equal(globalCount, maxRequestCount);
             assert.equal(normalCount, 1);
             assert.equal(count, maxRequestCount);

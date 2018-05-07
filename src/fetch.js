@@ -1,15 +1,13 @@
-import Ajax from './ajax';
+import adapter from './adapters';
 
-export default function fetch (...args) {
+export default function fetch (request) {
   var _resolve, _reject;
   var p = new Promise((resolve, reject) => {
     _resolve = resolve;
     _reject = reject;
   });
 
-  var ajax = new Ajax(...args);
-
-  ajax._request.setOptions({
+  adapter(request, {
     onsuccess: function (response) {
       return _resolve(response);
     },
@@ -23,8 +21,6 @@ export default function fetch (...args) {
       }
     }
   })
-
-  ajax.send();
 
   return p;
 }

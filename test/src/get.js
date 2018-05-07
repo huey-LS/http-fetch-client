@@ -9,77 +9,43 @@ module.exports = function (FetchClient) {
     it('method is GET', () => {
       fetch.get('http://fake.com');
 
-      let { xhr } = getFakeXhr();
+      let { xhr, respond } = getFakeXhr();
       assert.equal(xhr.method, 'GET')
-      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+      respond(200, { 'Content-Type': 'text/plain' }, '123');
     });
 
-    it('request body to query', () => {
+    it('request with query', () => {
       fetch
         .get('http://fake.com', {
-          body: data
+          query: data
         });
 
       let { xhr } = getFakeXhr();
-      assert.equal(xhr.requestBody, 'test=abc');
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
       assert.equal(xhr.url, 'http://fake.com?test=abc');
-      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     })
 
-    it('request body to url', () => {
-      fetch
-        .get('http://fake.com/{test}', {
-          body: data
-        });
+    // it('request body to url', () => {
+    //   fetch
+    //     .get('http://fake.com/{test}', {
+    //       body: data
+    //     });
 
-      let { xhr } = getFakeXhr();
-      assert.equal(xhr.requestBody, 'test=abc');
-      assert.equal(xhr.url, 'http://fake.com/abc?test=abc');
-      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
-    })
+    //   let { xhr } = getFakeXhr();
+    //   assert.equal(xhr.requestBody, 'test=abc');
+    //   assert.equal(xhr.url, 'http://fake.com/abc?test=abc');
+    //   xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    // })
 
-    it('request body to query with auto encodeURI', () => {
+    it('request query auto encodeURI', () => {
       fetch
         .get('http://fake.com', {
-          body: { test: 'a&b' }
+          query: { test: 'a&b' }
         });
 
       let { xhr } = getFakeXhr();
-      assert.equal(xhr.requestBody, 'test=a%26b');
       assert.equal(xhr.url, 'http://fake.com?test=a%26b');
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
-    })
-
-    it('response body to text', (done) => {
-      fetch
-        .get('http://fake.com')
-        .use((response) => {
-          try {
-            assert.equal(response.text(), 'test');
-            done();
-          } catch (e) {
-            done(e);
-          }
-        });
-
-      let { xhr } = getFakeXhr();
-      xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
-    })
-
-    it('response body to json', (done) => {
-      fetch
-        .get('http://fake.com')
-        .use((response) => {
-          try {
-            assert.deepEqual(response.json(), data);
-            done();
-          } catch (e) {
-            done(e)
-          }
-        });
-
-      let { xhr } = getFakeXhr();
-      xhr.respond(200, { 'Content-Type': 'text/plain' }, JSON.stringify(data));
     })
   })
 }
