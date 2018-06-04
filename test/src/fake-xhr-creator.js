@@ -12,7 +12,8 @@ exports.createFakeXhr = function () {
       xhr = _xhr;
     };
     // console.log(sinon.xhr.supportsTimeout)
-    global.window.XMLHttpRequest = fake;
+    global.XMLHttpRequest = fake;
+    // console.log('set global.XMLHttpRequest')
   });
   after(function () {
     fake.restore();

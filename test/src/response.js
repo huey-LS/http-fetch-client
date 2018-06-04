@@ -41,5 +41,22 @@ module.exports = function (FetchClient) {
       let { xhr } = getFakeXhr();
       xhr.respond(200, { 'Content-Type': 'text/json' }, JSON.stringify(data));
     })
+
+    it('get response use promise', (done) => {
+      fetch
+        .get('http://fake.com')
+        .promisify()
+        .then(({ response }) => {
+          try {
+            assert.deepEqual(response.ok, true);
+            done();
+          } catch (e) {
+            done(e)
+          }
+        });
+
+      let { xhr } = getFakeXhr();
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    })
   })
 }

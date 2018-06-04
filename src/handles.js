@@ -10,6 +10,27 @@ export default class Handles {
   use = useNewHandles.bind(this)
   catch = catchNewHandles.bind(this)
 
+  promisify ({ onlyWhenOk = false } = {}) {
+    return new Promise((resolve, reject) => {
+      this.use({
+        success: (ctx) => {
+          if (onlyWhenOk) {
+            if (ctx.response.ok) {
+              resolve(ctx);
+            } else {
+              reject(ctx)
+            }
+          } else {
+            resolve(ctx);
+          }
+        },
+        error: (ctx) => {
+          reject(ctx);
+        }
+      })
+    })
+  }
+
   start ({ ctx = {}, type = 'success' } = {}) {
     let handleFns = this.handleQueue
       .filter((handle) => handle[type])

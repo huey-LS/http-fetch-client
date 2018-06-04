@@ -58,7 +58,18 @@ export default function ajax (request, options) {
 }
 
 function createXMLHttpRequest () {
-  return new window.XMLHttpRequest();
+  var _g = (
+    'undefined' !== typeof global
+    ? global
+    : 'undefined' !== typeof window
+    ? window
+    : null
+  )
+  if (_g && typeof _g.XMLHttpRequest !== 'undefined') {
+    return new _g.XMLHttpRequest();
+  } else {
+    throw new Error('XMLHttpRequest not support')
+  }
 }
 
 function applyCallback (xhr, callback) {

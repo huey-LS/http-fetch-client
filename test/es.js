@@ -1,6 +1,4 @@
-global.window = {
-  XMLHttpRequest: {}
-}
+global.XMLHttpRequest = function () {};
 
 var OtherFetchClient = require('../lib/index');
 var FetchClient = OtherFetchClient.default;
