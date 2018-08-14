@@ -20,6 +20,7 @@ module.exports = function (FetchClient, OtherFetchClient) {
             let { send, handle } = OtherFetchClient.requestWithoutSend(request);
             // set handles
             handle.use(this);
+            handle.catch(this);
             send();
             setRespond();
           } catch (e) {

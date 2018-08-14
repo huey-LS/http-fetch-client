@@ -116,8 +116,6 @@ function catchNewHandles (handle) {
   if (handle) {
     if (handle instanceof Handles) {
       handles = handle.catchHandleQueue;
-    } else if (Array.isArray(handle)) {
-      handles = handle;
     } else if (typeof handle === 'function') {
       handles = [handle];
     }

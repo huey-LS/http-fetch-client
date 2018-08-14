@@ -1,10 +1,19 @@
 import Message from './message';
 import createContentType, {
+  FORMAT_TYPES,
+  MEDIA_TYPES
+} from '../utils/content-type';
+
+const {
   FORMAT_FORM,
   FORMAT_TEXT,
+  FORMAT_JSON,
+} = FORMAT_TYPES;
+
+const {
   MEDIA_APPLICATION,
   MEDIA_TEXT
-} from '../utils/content-type';
+} = MEDIA_TYPES;
 
 const defaultOptions = {
   timeout: 20000,
@@ -45,11 +54,12 @@ export default class Request extends Message {
     this.responseType = opts.responseType;
   }
 
-  getBody () {
+  getRequestBody () {
     if (this.method === 'GET') {
       return '';
     } else {
-      return Message.prototype.getBody.call(this);
+      let formatType = this.header.getContentFormatType();
+      return this.body.write(formatType)
     }
   }
 }

@@ -1,10 +1,16 @@
-export const FORMAT_JSON = 'json';
-export const FORMAT_FORM = 'x-www-form-urlencoded';
-export const FORMAT_TEXT = 'plain';
-export const FORMAT_FORM_DATA = 'form-data'
 
-export const MEDIA_APPLICATION = 'application';
-export const MEDIA_TEXT = 'text';
+export const FORMAT_TYPES = {
+  FORMAT_JSON: 'json',
+  FORMAT_FORM: 'x-www-form-urlencoded',
+  FORMAT_TEXT: 'plain',
+  FORMAT_FORM_DATA: 'form-data',
+  FORMAT_OCTET_STREAM: 'octet-stream'
+};
+
+export const MEDIA_TYPES = {
+  MEDIA_APPLICATION: 'application',
+  MEDIA_TEXT: 'text'
+}
 
 export const CHARSET_UTF8 = 'UTF-8';
 

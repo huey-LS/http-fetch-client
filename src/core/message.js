@@ -61,15 +61,6 @@ export default class Message {
   // alias get/set for body
   getBody () {
     let formatType = this.header.getContentFormatType();
-    return this.body.format(formatType);
-  }
-
-  getBodyStringify () {
-    let formatType = this.header.getContentFormatType();
-    return this.body.formatStringify(formatType);
-  }
-
-  setBody (body) {
-    return this.body.set(body);
+    return this.body.read(formatType);
   }
 }

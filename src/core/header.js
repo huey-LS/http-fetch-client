@@ -15,6 +15,7 @@ export default class Header {
    * @memberof Headers
    */
   constructor (headers) {
+    this.originHeaders = headers;
     if (typeof headers === 'string') {
       this._headers = this.parse(headers);
     } else if (headers) {

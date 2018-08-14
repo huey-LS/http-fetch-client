@@ -69,7 +69,7 @@ module.exports = function (FetchClient) {
         })
         .use({
           success: () => {
-            console.log('in success')
+            done('error');
           },
           error: ({ response, request }) => {
             try {
@@ -81,6 +81,41 @@ module.exports = function (FetchClient) {
             }
           }
         })
+    })
+
+    it('should catch abort', (done) => {
+      fetch
+        .get('http://fake.com')
+        .use({
+          success: () => {
+            done('error');
+          },
+          error: ({ response }) => {
+            try {
+              assert.equal(response.isAborted(), true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          }
+        })
+      let { xhr } = getFakeXhr();
+      xhr.abort();
+    })
+
+    it('should catch error', (done) => {
+      fetch
+        .get('http://fake.com')
+        .use({
+          success: () => {
+            throw new Error('error')
+          }
+        })
+        .catch(function (error) {
+          done();
+        })
+      let { xhr } = getFakeXhr();
+      xhr.respond(500, { 'Content-Type': 'text/plain' }, 'error');
     })
   })
 }

@@ -1,12 +1,19 @@
 import {
   alias
 } from '../utils/decorators';
+
 import {
-  FORMAT_JSON,
-  FORMAT_FORM,
-  FORMAT_TEXT,
-  FORMAT_FORM_DATA
-} from '../utils/content-type';
+  stringify,
+  parse,
+  transferFormatType,
+  convertStringToBlob,
+  convertStringToJSON,
+  convertJSONToString,
+  convertJSONToFormData,
+  convertFormDataToJSON,
+  convertJSONToQueryString,
+  convertQueryStringToJSON
+} from '../utils/convert';
 
 /**
  * Body constructor options
@@ -34,44 +41,15 @@ export default class Body {
    */
   constructor (body) {
     this._body = body;
+    this.originBody = body;
   }
 
-  format (type) {
-    if (typeof this._body === 'string') {
-      switch(type) {
-        case FORMAT_TEXT:
-          return this.text();
-        case FORMAT_JSON:
-          return this.json();
-        case FORMAT_FORM:
-          return this.form();
-        case FORMAT_FORM_DATA:
-          return this.formData();
-        case 'blob':
-          return this.blob();
-      }
-
-      return '';
-    } else {
-      return this._body;
-    }
+  write (formatType) {
+    return stringify(this._body, transferFormatType(formatType))
   }
 
-  formatStringify (type) {
-    switch(type) {
-      case FORMAT_TEXT:
-        return this.text();
-      case FORMAT_JSON:
-        return this.jsonStringify();
-      case FORMAT_FORM:
-        return this.formStringify();
-      case FORMAT_FORM_DATA:
-        return this.formData();
-      case 'blob':
-        return this.blob();
-    }
-
-    return '';
+  read (formatType) {
+    return parse(this._body, transferFormatType(formatType))
   }
 
   /**
@@ -82,16 +60,12 @@ export default class Body {
    */
   @alias('json')
   toJSON () {
-    if (typeof this._body === 'string') {
-      return JSON.parse(this._body);
-    } else {
-      return this._body;
-    }
+    return convertStringToJSON(this._body);
   }
 
   @alias('jsonStringify')
-  toJsonString () {
-    return JSON.stringify(this._body);
+  toJSONString () {
+    return convertJSONToString(this._body);
   }
 
   /**
@@ -101,29 +75,12 @@ export default class Body {
    */
   @alias('form')
   toForm () {
-    let body = this._body;
-    if (typeof body === 'string') {
-      return body.split('&').reduce((r, item) => {
-        let arr = item.split('=');
-        r[arr[0]] = typeof arr[1] === 'undefined' ? true : decodeURIComponent(arr[1]);
-        return r;
-      }, {})
-    }
-    return body;
+    return convertQueryStringToJSON(this._body)
   }
 
   @alias('formStringify')
   toFormString () {
-    let body = this._body;
-    if (!body) {
-      return '';
-    } else if (typeof body === 'string') {
-      return body;
-    } else {
-      return Object.keys(body)
-        .map((key) => `${key}=${encodeURIComponent(body[key])}`)
-        .join('&');
-    }
+    return convertJSONToQueryString(this._body)
   }
 
   /**
@@ -133,23 +90,9 @@ export default class Body {
    */
   @alias('formData')
   toFormData () {
-    let data = this.json();
-    if (!data) {
-      return '';
-    } else if (typeof FormData === 'function') {
-      let formData = new FormData();
-      return Object.keys(data)
-        .reduce((formData, key) => {
-          let _value = data[key];
-          if (typeof _value === 'string') {
-            _value = encodeURIComponent(_value);
-          }
-          formData.append(key, _value);
-          return formData;
-        }, formData);
-    } else {
-      return this.form();
-    }
+    return convertJSONToFormData(
+      convertStringToJSON(this._body)
+    )
   }
 
   /**
@@ -161,7 +104,7 @@ export default class Body {
   @alias('blob')
   toBlob (options) {
     if (Blob) {
-      return new Blob([this._body], options);
+      return convertStringToBlob(this._body, options);
     }
   }
 
@@ -173,6 +116,8 @@ export default class Body {
    */
   @alias('text')
   toText () {
-    return this._body.toString();
+    return convertJSONToString(
+      convertFormDataToJSON(this._body)
+    );
   }
 }

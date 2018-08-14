@@ -12,6 +12,10 @@ module.exports = function (FetchClient) {
             request.setHeaders({
               'X-Custom-Header': 'some'
             });
+            request.header.append({
+              'X-Custom-Header-Append': 'some'
+            });
+            request.header.append('X-Custom-Header-Append2', 'some');
           }
         });
 
@@ -19,6 +23,8 @@ module.exports = function (FetchClient) {
 
       let { xhr } = getFakeXhr();
       assert.equal(xhr.requestHeaders['X-Custom-Header'], 'some');
+      assert.equal(xhr.requestHeaders['X-Custom-Header-Append'], 'some');
+      assert.equal(xhr.requestHeaders['X-Custom-Header-Append2'], 'some');
       xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
     })
 
@@ -74,7 +80,7 @@ module.exports = function (FetchClient) {
       xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
     });
 
-    it('use array handle', (done) => {
+    it('can use array handle', (done) => {
       let fetch = new FetchClient();
       fetch.use([
         {
@@ -98,5 +104,46 @@ module.exports = function (FetchClient) {
       assert.equal(xhr.requestHeaders['X-Custom-Header'], 'some');
       xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
     })
+
+    it('should throw error of next called multiple', (done) => {
+      let fetch = new FetchClient();
+      fetch.use(
+        async function (ctx, next) {
+          try {
+            await next();
+            await next();
+            done('not throw error');
+          } catch (e) {
+            done()
+          }
+        }
+      );
+      fetch.get('http://fake.com');
+      let { xhr } = getFakeXhr();
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
+    })
+
+    // it('use next not in async', (done) => {
+    //   let fetch = new FetchClient();
+    //   fetch.use([
+    //     function (ctx, next) {
+    //       next()
+    //         .then((r) => {
+    //           try {
+    //             assert.equal(r, '1');
+    //             done();
+    //           } catch (e) {
+    //             done(e)
+    //           }
+    //         });
+    //     },
+    //     function (ctx) {
+    //       return '1';
+    //     }
+    //   ]);
+    //   fetch.get('http://fake.com');
+    //   let { xhr } = getFakeXhr();
+    //   xhr.respond(200, { 'Content-Type': 'text/plain' }, 'test');
+    // })
   })
 }

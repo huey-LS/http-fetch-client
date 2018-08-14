@@ -4,7 +4,7 @@ import Response from '../core/response';
 export default function ajax (request, options) {
   var method = request.getMethod();
   var headers = request.getHeaders();
-  var body = request.getBodyStringify();
+  var body = request.getRequestBody();
   var url = request.getURL();
   var async = request.async;
   var timeout = request.timeout;
@@ -96,11 +96,11 @@ function createAbort (xhr, onerror, request) {
   }
 }
 
-function cancel (xhr, onerror, request) {
-  if (xhr.readyState !== 4 && !xhr.end) {
-    xhr.canceled = true;
-    xhr.end = true;
-    request.canceled = true;
-    applyCallback(xhr, onerror);
-  }
-}
+// function cancel (xhr, onerror, request) {
+//   if (xhr.readyState !== 4 && !xhr.end) {
+//     xhr.canceled = true;
+//     xhr.end = true;
+//     request.canceled = true;
+//     applyCallback(xhr, onerror);
+//   }
+// }
