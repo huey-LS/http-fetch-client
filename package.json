@@ -55,6 +55,6 @@
     "sinon": "^3.2.1"
   },
   "dependencies": {
-    "querystringify": "^2.0.0"
+    "url-parse": "^1.2.0"
   }
 }
