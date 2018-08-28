@@ -25,6 +25,17 @@ module.exports = function (FetchClient) {
       assert.equal(xhr.url, 'http://fake.com?test=abc');
     })
 
+    it('request with REST', () => {
+      fetch
+        .get('http://fake.com/{test}', {
+          rest: data
+        });
+
+      let { xhr } = getFakeXhr();
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+      assert.equal(xhr.url, 'http://fake.com/abc');
+    })
+
     // it('request body to url', () => {
     //   fetch
     //     .get('http://fake.com/{test}', {

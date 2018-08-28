@@ -52,11 +52,14 @@ export default class Request extends Message {
     this.async = opts.async;
     this.timeout = opts.timeout;
     this.responseType = opts.responseType;
+    this.bodyFormatType = opts.bodyFormatType;
   }
 
   getRequestBody () {
     if (this.method === 'GET') {
       return '';
+    } else if (this.bodyFormatType) {
+      return this.body.write(this.bodyFormatType);
     } else {
       let formatType = this.header.getContentFormatType();
       return this.body.write(formatType)

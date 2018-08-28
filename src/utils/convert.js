@@ -130,15 +130,17 @@ export function convertJSONToString (json) {
 }
 
 export function convertJSONToFormData (json) {
-  return Object.keys(json)
-    .reduce((formData, key) => {
-      let _value = json[key];
-      if (typeof _value === 'string') {
-        _value = encodeURIComponent(_value);
-      }
-      formData.append(key, _value);
-      return formData;
-    }, formData);
+  if (typeof FormData !== 'undefined') {
+    return Object.keys(json)
+      .reduce((formData, key) => {
+        let _value = json[key];
+        if (typeof _value === 'string') {
+          _value = encodeURIComponent(_value);
+        }
+        formData.append(key, _value);
+        return formData;
+      }, new FormData());
+  }
 }
 
 export function convertFormDataToJSON (formData) {

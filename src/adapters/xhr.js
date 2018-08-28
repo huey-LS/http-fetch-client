@@ -33,7 +33,13 @@ export default function ajax (request, options) {
   }
 
   Object.keys(headers).forEach((key) => {
-    xhr.setRequestHeader(key, headers[key]);
+    if (
+      key.toLowerCase() !== 'content-type'
+      || Object.prototype.toString.call(body) !== '[object FormData]'
+    ) {
+      // 使用 FormData时不能设置 content-type
+      xhr.setRequestHeader(key, headers[key]);
+    }
   });
 
   xhr.onreadystatechange = () => {

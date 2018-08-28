@@ -18,18 +18,26 @@ export default class Message {
    * @param {any} opts.body
    * @memberof Message
    */
-  constructor ({
-    url,
-    method = 'GET',
-    headers,
-    query,
-    body,
-    type
-  }) {
-    this.url = new URL(url);
+  constructor (opts = {}) {
+    const {
+      url,
+      method = 'GET',
+      headers,
+      query,
+      body,
+      rest,
+      type
+    } = opts;
+    this.options = opts;
+    this.url = new RESTURL(url);
     if (query) {
       this.url.set('query', query);
     }
+
+    if (rest) {
+      this.url.set('rest', rest);
+    }
+
     this.header = new Header(headers);
     this.body = new Body(body);
     this.setMethod(method);
@@ -39,6 +47,7 @@ export default class Message {
   getMethod () {
     return this.method;
   }
+
   setMethod (method) {
     if (typeof method === 'string') {
       this.method = method.toUpperCase();
@@ -62,5 +71,29 @@ export default class Message {
   getBody () {
     let formatType = this.header.getContentFormatType();
     return this.body.read(formatType);
+  }
+}
+
+class RESTURL extends URL {
+  RESTRegexp = /{(\w+)}/g;
+
+  toString () {
+    if (this.rest) {
+      let pathname = this.pathname;
+      let RESTData = this.rest;
+      let currentPathname = pathname.replace(this.RESTRegexp, (s, s1) => {
+          if (RESTData[s1]) {
+            return RESTData[s1];
+          } else {
+            return s;
+          }
+        })
+
+      return URL.prototype.toString.call(Object.assign({}, this, {
+        pathname: currentPathname
+      }))
+    } else {
+      return URL.prototype.toString.call(this);
+    }
   }
 }

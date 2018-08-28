@@ -40,6 +40,10 @@ export default class Body {
    * @memberof Body
    */
   constructor (body) {
+    this.reset(body);
+  }
+
+  reset (body) {
     this._body = body;
     this.originBody = body;
   }

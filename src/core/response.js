@@ -21,4 +21,16 @@ export default class Response extends Message {
   isConnectSuccess () {
     return this.readyState > 0
   }
+
+  json () {
+    return this.body.json();
+  }
+
+  blob (...args) {
+    return this.body.blob(...args);
+  }
+
+  text () {
+    return this.body.text();
+  }
 }
