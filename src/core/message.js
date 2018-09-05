@@ -82,7 +82,7 @@ class RESTURL extends URL {
       let pathname = this.pathname;
       let RESTData = this.rest;
       let currentPathname = pathname.replace(this.RESTRegexp, (s, s1) => {
-          if (RESTData[s1]) {
+          if (typeof RESTData[s1] !== 'undefined') {
             return RESTData[s1];
           } else {
             return s;

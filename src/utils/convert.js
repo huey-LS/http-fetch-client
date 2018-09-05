@@ -115,7 +115,11 @@ export function convertStringToArrayBuffer (str) {
 
 export function convertStringToJSON (str) {
   if (typeof str === 'string') {
-    return JSON.parse(str);
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return null;
+    }
   } else {
     return str;
   }
