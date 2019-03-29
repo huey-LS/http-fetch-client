@@ -31,7 +31,7 @@ const defaultHeaders = {
   }),
   'Accept': createContentType({
     MIMEType: {
-      media: MEDIA_TEXT,
+      type: MEDIA_APPLICATION,
       format: FORMAT_TEXT
     }
   })
@@ -49,6 +49,7 @@ export default class Request extends Message {
       ...opts.headers
     }
     super(opts);
+    this.encode = opts.encode;
     this.async = opts.async;
     this.timeout = opts.timeout;
     this.responseType = opts.responseType;
@@ -59,10 +60,10 @@ export default class Request extends Message {
     if (this.method === 'GET') {
       return '';
     } else if (this.bodyFormatType) {
-      return this.body.write(this.bodyFormatType);
+      return this.body.write(this.bodyFormatType, { encode: this.encode });
     } else {
       let formatType = this.header.getContentFormatType();
-      return this.body.write(formatType)
+      return this.body.write(formatType, { encode: this.encode })
     }
   }
 }

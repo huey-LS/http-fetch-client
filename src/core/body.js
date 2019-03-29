@@ -48,12 +48,12 @@ export default class Body {
     this.originBody = body;
   }
 
-  write (formatType) {
-    return stringify(this._body, transferFormatType(formatType))
+  write (formatType, options) {
+    return stringify(this._body, transferFormatType(formatType), options)
   }
 
-  read (formatType) {
-    return parse(this._body, transferFormatType(formatType))
+  read (formatType, options) {
+    return parse(this._body, transferFormatType(formatType), options)
   }
 
   /**

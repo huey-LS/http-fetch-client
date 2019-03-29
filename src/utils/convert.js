@@ -27,43 +27,53 @@ export const DATA_TYPE = {
  * @param {any} data
  * @param {BodyType} type
  */
-export function stringify (data, type) {
-  var originType = getType(data);
+export function stringify (data, type, options) {
+  var originType;
 
-  if (originType === type) return data;
+  if (
+    !type ||
+    type === (originType = getType(data))
+  ) return data;
   if (type === DATA_TYPE.FORMAT_JSON) {
-    return convertJSONToString(data);
+    return convertJSONToString(data, options);
   } else if (type === DATA_TYPE.FORMAT_FORM_DATA) {
     return convertJSONToFormData(
-      convertStringToJSON(data)
+      convertStringToJSON(data, options),
+      options
     )
   } else if (type === DATA_TYPE.FORMAT_OCTET_STREAM) {
     return convertStringToBlob(
       convertJSONToString(
-        convertFormDataToJSON(data)
-      )
+        convertFormDataToJSON(data, options),
+        options
+      ),
+      options
     )
   } else if (type === DATA_TYPE.FORMAT_FORM) {
     return convertJSONToQueryString(
-      convertFormDataToJSON(data)
+      convertFormDataToJSON(data, options),
+      options
     )
   }
 }
 
 // try convert to object from string
-export function parse (data, type) {
-  var originType = getType(data);
+export function parse (data, type, options) {
+  var originType;
 
-  if (originType === type) return data;
+  if (
+    !type ||
+    type === (originType = getType(data))
+  ) return data;
   if (type === DATA_TYPE.FORMAT_JSON) {
-    return convertStringToJSON(data);
+    return convertStringToJSON(data, options);
   } else if (type === DATA_TYPE.FORMAT_FORM_DATA) {
     // TODO: transfer string to formData
     // return convertStringToFormData(data)
   } else if (type === DATA_TYPE.FORMAT_OCTET_STREAM) {
-    return convertStringToBlob(data);
+    return convertStringToBlob(data, options);
   } else if (type === DATA_TYPE.FORMAT_FORM) {
-    return convertQueryStringToJSON(data);
+    return convertQueryStringToJSON(data, options);
   }
 }
 
@@ -133,12 +143,12 @@ export function convertJSONToString (json) {
   }
 }
 
-export function convertJSONToFormData (json) {
+export function convertJSONToFormData (json, { encode = true } = {}) {
   if (typeof FormData !== 'undefined') {
     return Object.keys(json)
       .reduce((formData, key) => {
         let _value = json[key];
-        if (typeof _value === 'string') {
+        if (encode && typeof _value === 'string') {
           _value = encodeURIComponent(_value);
         }
         formData.append(key, _value);
@@ -159,7 +169,7 @@ export function convertFormDataToJSON (formData) {
   }
 }
 
-export function convertJSONToQueryString (json) {
+export function convertJSONToQueryString (json, { encode = true } = {}) {
   if (typeof json === 'string') {
     return json;
   }

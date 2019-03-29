@@ -36,6 +36,29 @@ module.exports = function (FetchClient) {
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     })
 
+    it('request form body with auto encode ', () => {
+      fetch
+        .post('http://fake.com', {
+          body: {'test': '/'}
+        });
+
+      let { xhr } = getFakeXhr();
+      assert.equal(xhr.requestBody.replace(/[\n\r]/g, ''), 'test=%2F')
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    })
+
+    it('request form body without encode ', () => {
+      fetch
+        .post('http://fake.com', {
+          body: {'test': '/'},
+          encode: false
+        });
+
+      let { xhr } = getFakeXhr();
+      assert.equal(xhr.requestBody.replace(/[\n\r]/g, ''), 'test=/')
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    })
+
     it('request json body', () => {
       fetch
         .post('http://fake.com', {
