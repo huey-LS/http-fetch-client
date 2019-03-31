@@ -29,12 +29,7 @@ const defaultHeaders = {
       format: FORMAT_FORM
     }
   }),
-  'Accept': createContentType({
-    MIMEType: {
-      type: MEDIA_APPLICATION,
-      format: FORMAT_TEXT
-    }
-  })
+  'Accept': '*/*'
 }
 
 export default class Request extends Message {
