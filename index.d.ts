@@ -59,8 +59,7 @@ interface AsyncNextFunction {
 }
 
 declare interface middleware {
-  (requestContext: RequestContext): Promise<any>|void;
-  (requestContext: RequestContext, next: AsyncNextFunction): Promise<any>;
+  (requestContext: RequestContext, next?: AsyncNextFunction): void|Promise<any>;
 }
 
 declare interface MiddlewareObject {
