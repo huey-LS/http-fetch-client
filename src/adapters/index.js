@@ -7,7 +7,7 @@ function getDefaultAdapter (root) {
     ? window
     : null
   )
-  console.log(typeof global, typeof global.XMLHttpRequest)
+  // console.log(typeof global, typeof global.XMLHttpRequest)
   if (_g && typeof _g.XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
     adapter = require('./xhr').default;

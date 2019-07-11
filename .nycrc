@@ -1,0 +1,16 @@
+{
+  "require": [
+    "babel-register"
+  ],
+  "all": true,
+  "reporter": [
+    "lcov",
+    "text"
+  ],
+  "include": [
+    "src/**/*.js"
+  ],
+  "sourceMap": false,
+  "instrument": true,
+  "exclude-after-remap": false
+}
