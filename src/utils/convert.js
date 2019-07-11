@@ -29,7 +29,6 @@ export const DATA_TYPE = {
  */
 export function stringify (data, type, options) {
   var originType;
-
   if (
     !type ||
     type === (originType = getType(data))
@@ -67,9 +66,6 @@ export function parse (data, type, options) {
   ) return data;
   if (type === DATA_TYPE.FORMAT_JSON) {
     return convertStringToJSON(data, options);
-  } else if (type === DATA_TYPE.FORMAT_FORM_DATA) {
-    // TODO: transfer string to formData
-    // return convertStringToFormData(data)
   } else if (type === DATA_TYPE.FORMAT_OCTET_STREAM) {
     return convertStringToBlob(data, options);
   } else if (type === DATA_TYPE.FORMAT_FORM) {
@@ -169,7 +165,7 @@ export function convertFormDataToJSON (formData) {
   }
 }
 
-export function convertJSONToQueryString (json, { encode = true } = {}) {
+export function convertJSONToQueryString (json) {
   if (typeof json === 'string') {
     return json;
   }

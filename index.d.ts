@@ -54,23 +54,31 @@ declare interface RequestContext {
   response: Response
 }
 
-interface AsyncNextFunction {
-  (): Promise<any>;
-}
+declare type AsyncNextFunction = () => Promise<any>;
+// interface AsyncNextFunction {
+//   (): Promise<any>;
+// }
+declare function middleware (requestContext: RequestContext, next?: AsyncNextFunction): void|Promise<any>;
 
-declare interface middleware {
-  (requestContext: RequestContext, next?: AsyncNextFunction): void|Promise<any>;
-}
+declare type middlewareType = typeof middleware;
+
+// declare type middleware = (requestContext: RequestContext) => void|Promise<any>;
+// declare type middleware = (requestContext: RequestContext, next: AsyncNextFunction) => Promise<any>;
+
+// declare interface middleware {
+//   (requestContext: RequestContext, next: AsyncNextFunction): Promise<any>;
+//   (requestContext: RequestContext): void|Promise<any>;
+// }
 
 declare interface MiddlewareObject {
-  beforeSend?: middleware,
-  success?: middleware,
-  error?: middleware
+  beforeSend?: middlewareType,
+  success?: middlewareType,
+  error?: middlewareType
 }
 
 declare class HttpFetchClient {
-  use (callback: middleware|MiddlewareObject): HttpFetchClient;
-  catch (callback: middleware): HttpFetchClient
+  use (callback: middlewareType|MiddlewareObject): HttpFetchClient;
+  catch (callback: middlewareType): HttpFetchClient
   get (url: string, options?: Object): HttpFetchClient;
   post (url: string, options?: Object): HttpFetchClient;
   put (url: string, options?: Object): HttpFetchClient;

@@ -25,6 +25,17 @@ module.exports = function (FetchClient) {
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     });
 
+    it('request text body', () => {
+      fetch
+        .post('http://fake.com', {
+          body: '123'
+        });
+
+      let { xhr } = getFakeXhr();
+      assert.equal(xhr.requestBody.replace(/[\n\r]/g, ''), '123')
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    })
+
     it('request form body', () => {
       fetch
         .post('http://fake.com', {
@@ -47,18 +58,6 @@ module.exports = function (FetchClient) {
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     })
 
-    it('request form body without encode ', () => {
-      fetch
-        .post('http://fake.com', {
-          body: {'test': '/'},
-          encode: false
-        });
-
-      let { xhr } = getFakeXhr();
-      assert.equal(xhr.requestBody.replace(/[\n\r]/g, ''), 'test=/')
-      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
-    })
-
     it('request json body', () => {
       fetch
         .post('http://fake.com', {
@@ -70,6 +69,17 @@ module.exports = function (FetchClient) {
 
       let { xhr } = getFakeXhr();
       assert.equal(xhr.requestBody, JSON.stringify(data));
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    })
+
+    it('check default request Content-Type', () => {
+      fetch
+        .post('http://fake.com', {
+          body: ''
+        });
+
+      let { xhr } = getFakeXhr();
+      assert.equal(xhr.requestHeaders['Content-Type'], 'application/x-www-form-urlencoded;charset=utf-8');
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     })
   })

@@ -60,7 +60,55 @@ module.exports = function (FetchClient) {
       xhr.respond(200, { 'Content-Type': 'text/json' }, JSON.stringify(data));
     })
 
-    it('get promisify response ', (done) => {
+    it('output body to json from queryString', (done) => {
+      let data = 'test=abc';
+      fetch
+        .get('http://fake.com')
+        .use(({ response }) => {
+          try {
+            assert.deepEqual(response.getBody(), data);
+            assert.deepEqual(response.body.toForm(), {test:'abc'});
+            done();
+          } catch (e) {
+            done(e)
+          }
+        });
+
+      let { xhr } = getFakeXhr();
+      xhr.respond(200, { 'Content-Type': 'text' }, data);
+    })
+
+    it('get body 2 times', (done) => {
+      let responseTextData = 'test';
+      let checkedCount = 0;
+      fetch
+        .get('http://fake.com')
+        .use(({ response }) => {
+          try {
+            assert.equal(response.getBody(), responseTextData);
+            assert.equal(response.body.text(), responseTextData);
+            checkedCount++;
+          } catch (e) {
+            done(e);
+          }
+        })
+        .use(({ response }) => {
+          try {
+            assert.equal(response.getBody(), responseTextData);
+            assert.equal(response.body.text(), responseTextData);
+            checkedCount++;
+            assert.equal(checkedCount, 2);
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
+
+      let { xhr } = getFakeXhr();
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, responseTextData);
+    })
+
+    it('get promisify response', (done) => {
       fetch
         .get('http://fake.com')
         .promisify()
