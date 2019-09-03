@@ -3,18 +3,40 @@ import Request from './core/request';
 import Handles, { HandleCreator } from './handles';
 
 export default class Client extends HandleCreator {
-  // _globalHandle = new HandleCreator()
-  // use = this._globalHandle.use.bind(this._globalHandle);
-  // catch = this._globalHandle.catch.bind(this._globalHandle);
-  request = request
-  requestBind = request.bind(this)
-  get = createBindMethod('GET', this.requestBind)
-  post = createBindMethod('POST', this.requestBind)
-  put = createBindMethod('PUT', this.requestBind)
-  del = createBindMethod('DELETE', this.requestBind)
+  constructor (options = {}) {
+    super();
+    if (options.adapter) {
+      this._adapter = options.adapter;
+    } else {
+      this._adapter = fetch;
+    }
+
+    this.request = function (...args) {
+      return request.call(this, ...args, this._adapter);
+    }
+    this.requestBind = this.request.bind(this);
+    this.get = createBindMethod('GET', this.requestBind);
+    this.post = createBindMethod('POST', this.requestBind);
+    this.put = createBindMethod('PUT', this.requestBind);
+    this.del = createBindMethod('DELETE', this.requestBind);
+  }
+
+  retry (request, handles) {
+    var {
+      handle,
+      send
+    } = requestWithoutSend(request, null, this._adapter);
+
+    handle.use(handles);
+    handle.catch(handles);
+
+    send();
+
+    return handle;
+  }
 }
 
-export function requestWithoutSend (url, options) {
+export function requestWithoutSend (url, options, adapter = fetch) {
   var fetchRequest;
   if ('string' === typeof url) {
     fetchRequest = new Request({
@@ -36,13 +58,13 @@ export function requestWithoutSend (url, options) {
     currentHandle = new Handles();
   }
 
-  currentHandle.start({
-    ctx: ctx,
-    type: 'beforeSend'
-  });
-
   function send () {
-    return fetch(fetchRequest)
+    currentHandle.start({
+      ctx: ctx,
+      type: 'beforeSend'
+    });
+
+    return adapter(fetchRequest)
       .then((response) => {
         ctx.response = response;
         return currentHandle.start({

@@ -44,9 +44,11 @@ export default class Header {
   @alias('set')
   append (name, value) {
     if (typeof name === 'string' && value) {
-      this._headers[name] = value;
+      let newHeader = {};
+      newHeader[name] = value;
+      this._headers = Object.assign({}, this._headers, newHeader);
     } else {
-      this._headers = Object.assign(this._headers, name);
+      this._headers = Object.assign({}, this._headers, name);
     }
   }
 

@@ -15,10 +15,19 @@
       "es5",
       "es6",
       "es7"
-    ]
+    ],
+    "outDir": "lib"
   },
+  "include": [
+    "src"
+  ],
   "exclude": [
+    "lib",
+    "dist",
+    "es",
+    "coverage",
     "node_modules",
-    "script"
+    "script",
+    "rollup.config.js"
   ]
 }

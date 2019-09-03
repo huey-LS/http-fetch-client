@@ -34,13 +34,22 @@ declare class Message {
 
 }
 
-declare class Request extends Message {
+export declare class Request extends Message {
   getRequestBody (): any;
+
+  responseType?: string;
 }
 
-declare class Response extends Message {
+export declare class Response extends Message {
+  constructor (options: {
+    status: number;
+    readyState: number;
+    headers?: any;
+    body?: any;
+    url: string;
+  });
   status: number;
-  readyStatus: number;
+  readyState: number;
   ok: boolean;
   isTimeout (): boolean;
   isAborted (): boolean;
@@ -58,7 +67,7 @@ declare type AsyncNextFunction = () => Promise<any>;
 // interface AsyncNextFunction {
 //   (): Promise<any>;
 // }
-declare function middleware (requestContext: RequestContext, next?: AsyncNextFunction): void|Promise<any>;
+declare function middleware (requestContext: RequestContext, next: AsyncNextFunction): void|Promise<any>;
 
 declare type middlewareType = typeof middleware;
 
@@ -76,7 +85,14 @@ declare interface MiddlewareObject {
   error?: middlewareType
 }
 
+declare function customAdapter (request: Request): Promise<Response>;
+
+declare interface PromisifyOptions {
+  onlyWhenOk?: boolean
+}
+
 declare class HttpFetchClient {
+  constructor (options?: { adapter: typeof customAdapter });
   use (callback: middlewareType|MiddlewareObject): HttpFetchClient;
   catch (callback: middlewareType): HttpFetchClient
   get (url: string, options?: Object): HttpFetchClient;
@@ -84,7 +100,8 @@ declare class HttpFetchClient {
   put (url: string, options?: Object): HttpFetchClient;
   del (url: string, options?: Object): HttpFetchClient;
   request (url: string, options?: Object): HttpFetchClient;
-  promisify (): Promise<RequestContext>
+  promisify (options?: PromisifyOptions): Promise<RequestContext>
+  retry (request: Request, handles: HttpFetchClient): HttpFetchClient
 }
 
 export default HttpFetchClient
