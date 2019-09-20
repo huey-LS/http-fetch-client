@@ -43,6 +43,8 @@ export function requestWithoutSend (url, options, adapter = fetch) {
       url,
       ...options
     });
+  } else if (url instanceof Request) {
+    fetchRequest = url;
   } else {
     fetchRequest = new Request(url);
   }
