@@ -30,9 +30,9 @@ export default class Header {
       return headers
         .split(/\r\n|\n/)
         .reduce((headers, header) => {
-          let [ key, val ] = header.split(':');
+          let [ key, ...val ] = header.split(':');
           if (key && val) {
-            headers[key.trim()] = val.trim();
+            headers[key.trim()] = val.join(':').trim();
           }
           return headers;
         }, {});
