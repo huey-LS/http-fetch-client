@@ -2,7 +2,13 @@
   "env": {
     "commonjs": {
       "presets": [
-        ["env", { "loose": true }],
+        ["env", {
+          "loose": true,
+          "targets": {
+            "chrome": 58,
+            "ie": 10
+          }
+        }],
         "stage-2"
       ],
       "plugins": [
@@ -12,7 +18,14 @@
     },
     "es": {
       "presets": [
-        ["env", { "loose": true, "modules": false }],
+        ["env", {
+          "loose": true,
+          "modules": false,
+          "targets": {
+            "chrome": 58,
+            "ie": 10
+          }
+        }],
         "stage-2"
       ],
       "plugins": [
@@ -22,7 +35,14 @@
     },
     "dist": {
       "presets": [
-        ["env", { "loose": true, "modules": false }],
+        ["env", {
+          "loose": true,
+          "modules": false,
+          "targets": {
+            "chrome": 58,
+            "ie": 10
+          }
+        }],
         "stage-2"
       ],
       "plugins": [

@@ -74,8 +74,13 @@ export function parse (data, type, options) {
 }
 
 export function transferFormatType (formatType) {
-  var key = Object.keys(FORMAT_TYPES).find((key) => (FORMAT_TYPES[key] === formatType));
-  return DATA_TYPE[key];
+  var keys = Object.keys(FORMAT_TYPES);
+  for (let i = 0; i < keys.length; i++) {
+    let key = keys[i];
+    if (FORMAT_TYPES[key] === formatType) {
+      return DATA_TYPE[key];
+    }
+  }
 }
 
 export function getType (data) {
