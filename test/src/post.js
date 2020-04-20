@@ -1,6 +1,9 @@
 var assert = require('assert');
+var chai = require('chai');
 
 var getFakeXhr = require('./fake-xhr-creator').getFakeXhr;
+
+var expect = chai.expect;
 
 module.exports = function (FetchClient) {
   describe('post', () => {
@@ -21,7 +24,7 @@ module.exports = function (FetchClient) {
 
       let { xhr } = getFakeXhr();
       assert.equal(xhr.method, 'POST')
-      assert.equal(xhr.url, 'http://fake.com?a=1');
+      expect(xhr.url).to.match(/^http:\/\/fake.com\?a=1&_=[0-9]+$/);
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     });
 

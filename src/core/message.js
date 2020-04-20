@@ -74,7 +74,7 @@ export default class Message {
   }
 }
 
-class RESTURL extends URL {
+export class RESTURL extends URL {
   RESTRegexp = /{(\w+)}/g;
 
   toString () {

@@ -1,4 +1,6 @@
-import Message from './message';
+import querystringify from 'querystringify';
+
+import Message, { RESTURL } from './message';
 import createContentType, {
   FORMAT_TYPES,
   MEDIA_TYPES
@@ -60,5 +62,14 @@ export default class Request extends Message {
       let formatType = this.header.getContentFormatType();
       return this.body.write(formatType, { encode: this.encode })
     }
+  }
+
+  getURLWithTimestamp () {
+    const url = new RESTURL(this.url.toString());
+    const query = querystringify.parse(url.query);
+    if (!query._) {
+      url.set('query', { ...query, _: new Date().getTime() })
+    }
+    return url.toString();
   }
 }

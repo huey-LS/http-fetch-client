@@ -1,6 +1,8 @@
-var assert = require('assert');
+var chai = require('chai');
 
 var getFakeXhr = require('./fake-xhr-creator').getFakeXhr;
+
+var expect = chai.expect;
 
 module.exports = function (FetchClient) {
   describe('get', function () {
@@ -10,7 +12,7 @@ module.exports = function (FetchClient) {
       fetch.get('http://fake.com');
 
       let { xhr, respond } = getFakeXhr();
-      assert.equal(xhr.method, 'GET')
+      expect(xhr.method).to.equal('GET');
       respond(200, { 'Content-Type': 'text/plain' }, '123');
     });
 
@@ -22,7 +24,7 @@ module.exports = function (FetchClient) {
 
       let { xhr } = getFakeXhr();
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
-      assert.equal(xhr.url, 'http://fake.com?test=abc');
+      expect(xhr.url).to.match(/^http:\/\/fake.com\?test=abc&_=[0-9]+$/);
     })
 
     it('request with REST', () => {
@@ -33,7 +35,7 @@ module.exports = function (FetchClient) {
 
       let { xhr } = getFakeXhr();
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
-      assert.equal(xhr.url, 'http://fake.com/abc');
+      expect(xhr.url).to.match(/^http:\/\/fake.com\/abc\?_=[0-9]+$/);
     })
 
     // it('request body to url', () => {
@@ -55,7 +57,7 @@ module.exports = function (FetchClient) {
         });
 
       let { xhr } = getFakeXhr();
-      assert.equal(xhr.url, 'http://fake.com?test=a%26b');
+      expect(xhr.url).to.match(/^http:\/\/fake.com\?test=a%26b&_=[0-9]+$/);
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     })
   })

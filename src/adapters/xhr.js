@@ -5,7 +5,7 @@ export default function ajax (request, options) {
   var method = request.getMethod();
   var headers = request.getHeaders();
   var body = request.getRequestBody();
-  var url = request.getURL();
+  var url = request.getURLWithTimestamp();
   var async = request.async;
   var timeout = request.timeout;
   var responseType = request.responseType;
