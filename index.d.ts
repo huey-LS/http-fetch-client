@@ -20,7 +20,7 @@ declare interface RESTURL {
 
 }
 
-declare class Message {
+declare class Message<T = any> {
   url: RESTURL;
   header: Header;
   body: Body;
@@ -30,7 +30,7 @@ declare class Message {
   setMethod (method: string): void;
 
   getURL (): string;
-  getBody (): any;
+  getBody (): T;
 
 }
 
@@ -40,7 +40,7 @@ export declare class Request extends Message {
   responseType?: string;
 }
 
-export declare class Response extends Message {
+export declare class Response<T = any> extends Message<T> {
   constructor (options: {
     status: number;
     readyState: number;
@@ -53,21 +53,21 @@ export declare class Response extends Message {
   ok: boolean;
   isTimeout (): boolean;
   isAborted (): boolean;
-  json(): Object;
+  json(): T;
   blob(): any;
   text(): string;
 }
 
-declare interface RequestContext {
+declare interface RequestContext<ResBody = any> {
   request: Request,
-  response: Response
+  response: Response<ResBody>
 }
 
 declare type AsyncNextFunction = () => Promise<any>;
 // interface AsyncNextFunction {
 //   (): Promise<any>;
 // }
-declare function middleware (requestContext: RequestContext, next: AsyncNextFunction): void|Promise<any>;
+declare function middleware<ResBody> (requestContext: RequestContext<ResBody>, next: AsyncNextFunction): void|Promise<any>;
 
 declare type middlewareType = typeof middleware;
 
@@ -79,9 +79,9 @@ declare type middlewareType = typeof middleware;
 //   (requestContext: RequestContext): void|Promise<any>;
 // }
 
-declare interface MiddlewareObject {
+declare interface MiddlewareObject<ResBody> {
   beforeSend?: middlewareType,
-  success?: middlewareType,
+  success?: middlewareType<ResBody>,
   error?: middlewareType
 }
 
@@ -91,17 +91,17 @@ declare interface PromisifyOptions {
   onlyWhenOk?: boolean
 }
 
-declare class HttpFetchClient {
+declare class HttpFetchClient<ResBody = any> {
   constructor (options?: { adapter: typeof customAdapter });
-  use (callback: middlewareType|MiddlewareObject): HttpFetchClient;
-  catch (callback: middlewareType): HttpFetchClient
-  get (url: string, options?: Object): HttpFetchClient;
-  post (url: string, options?: Object): HttpFetchClient;
-  put (url: string, options?: Object): HttpFetchClient;
-  del (url: string, options?: Object): HttpFetchClient;
-  request (url: string, options?: Object): HttpFetchClient;
-  promisify (options?: PromisifyOptions): Promise<RequestContext>
-  retry (request: Request, handles: HttpFetchClient): HttpFetchClient
+  use<UseResBody = ResBody> (callback: middlewareType<UseResBody>|MiddlewareObject<UseResBody>): HttpFetchClient<UseResBody>;
+  catch (callback: middlewareType): HttpFetchClient<ResBody>
+  get<GetResBody = ResBody>  (url: string, options?: Object): HttpFetchClient<GetResBody>;
+  post<PostResBody = ResBody>  (url: string, options?: Object): HttpFetchClient<PostResBody>;
+  put<PutResBody = ResBody>  (url: string, options?: Object): HttpFetchClient<PutResBody>;
+  del<DelResBody = ResBody>  (url: string, options?: Object): HttpFetchClient<DelResBody>;
+  request<RequestResBody = ResBody> (url: string, options?: Object): HttpFetchClient<RequestResBody>;
+  promisify<PromisifyResBody = ResBody>  (options?: PromisifyOptions): Promise<RequestContext<PromisifyResBody>>
+  retry (request: Request, handles: HttpFetchClient<ResBody>): HttpFetchClient<ResBody>
 }
 
 export default HttpFetchClient

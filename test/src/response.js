@@ -57,7 +57,7 @@ module.exports = function (FetchClient) {
         });
 
       let { xhr } = getFakeXhr();
-      xhr.respond(200, { 'Content-Type': 'text/json' }, JSON.stringify(data));
+      xhr.respond(200, { 'Content-Type': 'application/json;charset=UTF-8' }, JSON.stringify(data));
     })
 
     it('output body to json from queryString', (done) => {
