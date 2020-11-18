@@ -69,7 +69,10 @@ declare type AsyncNextFunction = () => Promise<any>;
 // }
 declare function middleware<ResBody> (requestContext: RequestContext<ResBody>, next: AsyncNextFunction): void|Promise<any>;
 
-declare type middlewareType = typeof middleware;
+// declare type middlewareType<ResBody> = typeof middleware<ResBody>;
+declare interface middlewareType<ResBody> {
+  (requestContext: RequestContext<ResBody>, next: AsyncNextFunction): void|Promise<any>;
+}
 
 // declare type middleware = (requestContext: RequestContext) => void|Promise<any>;
 // declare type middleware = (requestContext: RequestContext, next: AsyncNextFunction) => Promise<any>;
@@ -80,9 +83,9 @@ declare type middlewareType = typeof middleware;
 // }
 
 declare interface MiddlewareObject<ResBody> {
-  beforeSend?: middlewareType,
+  beforeSend?: middlewareType<ResBody>,
   success?: middlewareType<ResBody>,
-  error?: middlewareType
+  error?: middlewareType<ResBody>
 }
 
 declare function customAdapter (request: Request): Promise<Response>;
@@ -94,7 +97,7 @@ declare interface PromisifyOptions {
 declare class HttpFetchClient<ResBody = any> {
   constructor (options?: { adapter: typeof customAdapter });
   use<UseResBody = ResBody> (callback: middlewareType<UseResBody>|MiddlewareObject<UseResBody>): HttpFetchClient<UseResBody>;
-  catch (callback: middlewareType): HttpFetchClient<ResBody>
+  catch<CatchResBody = ResBody> (callback: middlewareType<CatchResBody>): HttpFetchClient<CatchResBody>
   get<GetResBody = ResBody>  (url: string, options?: Object): HttpFetchClient<GetResBody>;
   post<PostResBody = ResBody>  (url: string, options?: Object): HttpFetchClient<PostResBody>;
   put<PutResBody = ResBody>  (url: string, options?: Object): HttpFetchClient<PutResBody>;
