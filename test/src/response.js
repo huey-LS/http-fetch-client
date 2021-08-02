@@ -173,5 +173,32 @@ module.exports = function (FetchClient) {
       let { xhr } = getFakeXhr();
       xhr.respond(300, { 'Content-Type': 'text/plain' }, '');
     })
+
+    it('promisify suspend handles', (done) => {
+      var suspended = false;
+      fetch
+        .get('http://fake.com')
+        .use(async ({ response }, next) => {
+          await next();
+          if (suspended) {
+            done()
+          } else {
+            done(new Error('canSuspend'))
+          }
+        })
+        .promisify({
+          canSuspend: true
+        })
+        .then(([{ response }, stop, restart]) => {
+          stop();
+          setTimeout(() => {
+            suspended = true;
+            restart();
+          }, 100);
+        });
+
+      let { xhr } = getFakeXhr();
+      xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
+    })
   })
 }

@@ -20,6 +20,24 @@ declare interface RESTURL {
 
 }
 
+export declare interface MessageOption {
+  url: string;
+
+  method?: 'GET' | 'POST',
+
+  headers?: {
+    [key: string]: string
+  };
+
+  query?: {
+    [key: string]: any
+  };
+
+  body?: any;
+
+  rest?: any;
+}
+
 declare class Message<T = any> {
   url: RESTURL;
   header: Header;
@@ -34,7 +52,16 @@ declare class Message<T = any> {
 
 }
 
+export declare interface RequestOption extends MessageOption {
+  encode?: boolean;
+  async?: boolean;
+  timeout?: number;
+  responseType?: string;
+  bodyFormatType?: string;
+}
+
 export declare class Request extends Message {
+  constructor (options: RequestOption);
   getRequestBody (): any;
 
   responseType?: string;
@@ -94,16 +121,27 @@ declare interface PromisifyOptions {
   onlyWhenOk?: boolean
 }
 
+declare interface PreventPromisifyOptions extends PromisifyOptions {
+  suspended: true
+}
+
+
+
+declare type HttpFetchOptions = Omit<RequestOption, 'url'>;
+
 declare class HttpFetchClient<ResBody = any> {
   constructor (options?: { adapter: typeof customAdapter });
   use<UseResBody = ResBody> (callback: middlewareType<UseResBody>|MiddlewareObject<UseResBody>): HttpFetchClient<UseResBody>;
   catch<CatchResBody = ResBody> (callback: middlewareType<CatchResBody>): HttpFetchClient<CatchResBody>
-  get<GetResBody = ResBody>  (url: string, options?: Object): HttpFetchClient<GetResBody>;
-  post<PostResBody = ResBody>  (url: string, options?: Object): HttpFetchClient<PostResBody>;
-  put<PutResBody = ResBody>  (url: string, options?: Object): HttpFetchClient<PutResBody>;
-  del<DelResBody = ResBody>  (url: string, options?: Object): HttpFetchClient<DelResBody>;
-  request<RequestResBody = ResBody> (url: string, options?: Object): HttpFetchClient<RequestResBody>;
+  get<GetResBody = ResBody>  (url: string, options?: HttpFetchOptions): HttpFetchClient<GetResBody>;
+  post<PostResBody = ResBody>  (url: string, options?: HttpFetchOptions): HttpFetchClient<PostResBody>;
+  put<PutResBody = ResBody>  (url: string, options?: HttpFetchOptions): HttpFetchClient<PutResBody>;
+  del<DelResBody = ResBody>  (url: string, options?: HttpFetchOptions): HttpFetchClient<DelResBody>;
+  request<RequestResBody = ResBody> (url: string, options?: HttpFetchOptions): HttpFetchClient<RequestResBody>;
+
+  promisify<PromisifyResBody = ResBody>  (options: PreventPromisifyOptions): Promise<[RequestContext<PromisifyResBody>, () => void, () => void]>
   promisify<PromisifyResBody = ResBody>  (options?: PromisifyOptions): Promise<RequestContext<PromisifyResBody>>
+
   retry (request: Request, handles: HttpFetchClient<ResBody>): HttpFetchClient<ResBody>
 }
 

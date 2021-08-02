@@ -10,23 +10,67 @@ export default class Handles {
   use = useNewHandles.bind(this)
   catch = catchNewHandles.bind(this)
 
-  promisify ({ onlyWhenOk = false } = {}) {
+  promisify ({
+    onlyWhenOk = false,
+    canSuspend = false
+  } = {}) {
     return new Promise((resolve, reject) => {
+      let stopping  = null;
+      let stoppingResolve = null;
+      const stop = () => {
+        stopping = new Promise((resolve) => {
+          stoppingResolve = resolve;
+        });
+      }
+      const restart = () => {
+        stoppingResolve && stoppingResolve();
+      }
+
+      const waitingFinish = (handleResolve) => {
+        setTimeout(() => {
+          handleResolve(stopping);
+        }, 0);
+      }
+
       this.use({
-        success: (ctx) => {
+        success: (ctx) => new Promise((handleResolve) => {
           if (onlyWhenOk) {
             if (ctx.response.ok) {
-              resolve(ctx);
+              if (canSuspend) {
+                resolve([ctx, stop, restart]);
+                waitingFinish(handleResolve);
+              } else {
+                resolve(ctx);
+                handleResolve();
+              }
             } else {
-              reject(ctx)
+              if (canSuspend) {
+                reject([ctx, stop, restart]);
+                waitingFinish(handleResolve);
+              } else {
+                reject(ctx);
+                handleResolve();
+              }
             }
           } else {
-            resolve(ctx);
+            if (canSuspend) {
+              resolve([ctx, stop, restart]);
+              waitingFinish(handleResolve);
+            } else {
+              resolve(ctx);
+              handleResolve();
+            }
           }
-        },
-        error: (ctx) => {
-          reject(ctx);
-        }
+        }),
+        error: (ctx) => new Promise((handleResolve) => {
+          if (canSuspend) {
+            reject([ctx, stop, restart]);
+            waitingFinish(handleResolve);
+          } else {
+            reject(ctx);
+            handleResolve();
+          }
+        })
       })
     })
   }

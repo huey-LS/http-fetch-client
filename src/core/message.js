@@ -25,8 +25,7 @@ export default class Message {
       headers,
       query,
       body,
-      rest,
-      type
+      rest
     } = opts;
     this.options = opts;
     this.url = new RESTURL(url);
