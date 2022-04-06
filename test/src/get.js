@@ -24,7 +24,7 @@ module.exports = function (FetchClient) {
 
       let { xhr } = getFakeXhr();
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
-      expect(xhr.url).to.match(/^http:\/\/fake.com\?test=abc&_=[0-9]+$/);
+      expect(xhr.url).to.match(/^http:\/\/fake.com\/\?test=abc&_=[0-9]+$/);
     })
 
     it('request with REST', () => {
@@ -57,7 +57,7 @@ module.exports = function (FetchClient) {
         });
 
       let { xhr } = getFakeXhr();
-      expect(xhr.url).to.match(/^http:\/\/fake.com\?test=a%26b&_=[0-9]+$/);
+      expect(xhr.url).to.match(/^http:\/\/fake.com\/\?test=a%26b&_=[0-9]+$/);
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     })
   })

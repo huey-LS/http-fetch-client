@@ -25,21 +25,33 @@ export default class Message {
       headers,
       query,
       body,
-      rest
+      rest,
+      cache = false,
+      interceptors
     } = opts;
     this.options = opts;
     this.url = new RESTURL(url);
-    if (query) {
-      this.url.set('query', query);
+    let currentQuery = query ? { ...query } : {};
+    if (
+      !cache
+      && typeof currentQuery['_'] === 'undefined'
+    ) {
+      currentQuery._ = new Date().getTime();
     }
+    this.url.set('query', currentQuery);
 
     if (rest) {
-      this.url.set('rest', rest);
+      this.url.rest = rest;
     }
 
     this.header = new Header(headers);
     this.body = new Body(body);
+    this.interceptors = interceptors || {};
     this.setMethod(method);
+  }
+
+  getInterceptor (name) {
+    if (name) return this.interceptors[name];
   }
 
   // alias get for url

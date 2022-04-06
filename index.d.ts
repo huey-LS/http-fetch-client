@@ -58,6 +58,9 @@ export declare interface RequestOption extends MessageOption {
   timeout?: number;
   responseType?: string;
   bodyFormatType?: string;
+  interceptors?: {
+    xhr?: (xhr: XMLHttpRequest, body: any) => void | { xhr: XMLHttpRequest, body: any }
+  }
 }
 
 export declare class Request extends Message {

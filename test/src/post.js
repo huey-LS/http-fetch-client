@@ -24,7 +24,7 @@ module.exports = function (FetchClient) {
 
       let { xhr } = getFakeXhr();
       assert.equal(xhr.method, 'POST')
-      expect(xhr.url).to.match(/^http:\/\/fake.com\?a=1&_=[0-9]+$/);
+      expect(xhr.url).to.match(/^http:\/\/fake.com\/\?a=1&_=[0-9]+$/);
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
     });
 

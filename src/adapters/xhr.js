@@ -5,7 +5,7 @@ export default function ajax (request, options) {
   var method = request.getMethod();
   var headers = request.getHeaders();
   var body = request.getRequestBody();
-  var url = request.getURLWithTimestamp();
+  var url = request.getURL();
   var async = request.async;
   var timeout = request.timeout;
   var responseType = request.responseType;
@@ -55,11 +55,19 @@ export default function ajax (request, options) {
     }
   }
 
-  xhr.send(body);
 
   xhr._abort = xhr.abort;
   xhr.abort = createAbort(xhr, onerror, request);
 
+  var xhrInterceptor = request.getInterceptor('xhr');
+  if (typeof xhrInterceptor === 'function') {
+    var newXHRAndBody = xhrInterceptor(xhr, body);
+    if (newXHRAndBody) {
+      xhr = newXHRAndBody.xhr;
+      body = newXHRAndBody.body;
+    }
+  }
+  xhr.send(body);
   return xhr;
 }
 

@@ -63,13 +63,4 @@ export default class Request extends Message {
       return this.body.write(formatType, { encode: this.encode })
     }
   }
-
-  getURLWithTimestamp () {
-    const url = new RESTURL(this.url.toString());
-    const query = querystringify.parse(url.query);
-    if (!query._) {
-      url.set('query', { ...query, _: new Date().getTime() })
-    }
-    return url.toString();
-  }
 }

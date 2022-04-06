@@ -11,6 +11,6 @@ module.exports = function (name, FetchClient, OtherFetchClient) {
     require('./global')(FetchClient, OtherFetchClient);
     require('./catch')(FetchClient, OtherFetchClient);
     require('./retry')(FetchClient, OtherFetchClient);
-
+    require('./interceptors')(FetchClient, OtherFetchClient);
   });
 }

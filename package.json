@@ -25,7 +25,7 @@
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
     "build:dist": "cross-env BABEL_ENV=dist rollup -c rollup.config.js",
     "build": "npm run clean && npm run build:commonjs && npm run build:es && npm run build:dist",
-    "prepare": "npm run build",
+    "prepublish": "npm run build",
     "coverage": "codecov"
   },
   "prepublish": "",
