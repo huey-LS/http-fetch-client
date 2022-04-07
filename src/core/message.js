@@ -1,4 +1,6 @@
 import URL from 'url-parse';
+import qs from 'querystringify';
+
 import Header from './header';
 import Body from './body';
 
@@ -31,7 +33,18 @@ export default class Message {
     } = opts;
     this.options = opts;
     this.url = new RESTURL(url);
-    let currentQuery = query ? { ...query } : {};
+    let currentQuery = {};
+    if (typeof this.url.query === 'string') {
+      currentQuery = qs.parse(this.url.query);
+    } else {
+      currentQuery = { ...this.url.query }
+    }
+    if (query) {
+      currentQuery = {
+        ...currentQuery,
+        ...query
+      }
+    }
     if (
       !cache
       && typeof currentQuery['_'] === 'undefined'

@@ -1,5 +1,3 @@
-import querystringify from 'querystringify';
-
 import Message, { RESTURL } from './message';
 import createContentType, {
   FORMAT_TYPES,

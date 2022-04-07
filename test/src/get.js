@@ -18,13 +18,13 @@ module.exports = function (FetchClient) {
 
     it('request with query', () => {
       fetch
-        .get('http://fake.com', {
+        .get('http://fake.com?op=1', {
           query: data
         });
 
       let { xhr } = getFakeXhr();
       xhr.respond(200, { 'Content-Type': 'text/plain' }, '');
-      expect(xhr.url).to.match(/^http:\/\/fake.com\/\?test=abc&_=[0-9]+$/);
+      expect(xhr.url).to.match(/^http:\/\/fake.com\/\?op=1&test=abc&_=[0-9]+$/);
     })
 
     it('request with REST', () => {
